@@ -1,0 +1,350 @@
+@import "tailwindcss";
+
+@theme {
+	--color-text: #1d2025;
+	--color-body: #f1f4fa;
+	--color-one: #ffffff;
+	--color-two: #f1f4fa;
+	--color-primary: #2c2d3a;
+	--color-secondary: #2b66d3;
+	--color-success: #008000;
+	--color-danger: #ff0000;
+	--radius-base: 1.2rem;
+	--font-size: 15;
+}
+
+body {
+	font-family: "Geologica Variable", sans-serif;
+	font-size: calc(var(--font-size) * 1px);
+	line-height: 1.5;
+	text-size-adjust: none;
+	-webkit-text-size-adjust: none;
+	font-style: normal;
+	background-color: var(--color-body);
+	height: 100%;
+	color: var(--color-text);
+}
+
+.content {
+	min-height: 100vh;
+	display: grid;
+	grid-template-columns: auto 1fr;
+	width: 100%;
+}
+@media (max-width: 800px) {
+	.content {
+		grid-template-columns: 1fr;
+	}
+	main {
+		padding-bottom: 120px;
+	}
+}
+
+.logo-text {
+	font-family: "Audiowide", sans-serif;
+}
+
+.container {
+	@apply mx-auto max-w-[1440px] px-5;
+}
+
+.text-in-photo {
+	text-shadow:
+		0 1px 2px rgba(0, 0, 0, 0.6),
+		0 2px 4px rgba(0, 0, 0, 0.2);
+	color: white;
+	font-weight: 600;
+}
+/* Input */
+
+input,
+textarea,
+select {
+	@apply w-full border-none bg-transparent pt-[0.13rem] outline-none;
+}
+
+input::placeholder {
+	@apply text-sm font-light italic text-gray-500;
+}
+
+input:-webkit-autofill {
+	background: transparent !important;
+	color: var(--color-text) !important;
+	filter: none !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+	transition: background-color 5000s ease-in-out 0s;
+	font-size: calc(var(--font-size) * 1px);
+	color: var(--color-text) !important;
+	-webkit-text-fill-color: var(--color-text);
+	background-color: transparent;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+	-moz-appearance: textfield;
+}
+
+button:hover {
+	@apply cursor-pointer;
+}
+
+/* Form */
+
+select {
+	@apply appearance-none bg-transparent;
+	-webkit-appearance: none !important;
+	-moz-appearance: none !important;
+	appearance: none !important;
+	background-repeat: no-repeat;
+	background-position: right 0.5rem center;
+	background-size: 1em;
+	padding-right: 2.5rem;
+}
+
+.form-group {
+	@apply bg-two relative flex flex-col gap-0 rounded-xl border-2 border-transparent px-2.5 pb-1 pt-1.5;
+}
+
+.form-group label {
+	@apply text-xs font-medium uppercase text-slate-500;
+}
+
+.form-group.error {
+	@apply border-red-300;
+}
+
+.form-control {
+	@apply w-full border-none bg-transparent outline-none;
+}
+
+/* Button */
+
+.btn {
+	@apply mt-2 inline-block rounded-xl border-2 border-transparent px-4 py-1.5 text-center text-[15px] font-normal;
+	letter-spacing: 0.05em;
+}
+
+.btn-primary {
+	@apply bg-primary text-white;
+}
+
+.btn-link {
+	@apply text-primary bg-slate-100;
+}
+
+.btn-link:hover:not(.btn-link-active) {
+	@apply border-primary bg-white;
+}
+
+.btn-link-active {
+	@apply bg-primary text-white;
+}
+
+.btn-secondary {
+	@apply bg-secondary text-white;
+}
+
+.btn-white {
+	@apply bg-white text-black;
+}
+
+.btn-light {
+	@apply bg-slate-50 text-black;
+}
+
+.btn-danger {
+	@apply bg-red-500 text-white;
+}
+
+.btn-success {
+	@apply bg-green-500 text-white;
+}
+
+.btn-warning {
+	@apply bg-yellow-500 text-white;
+}
+
+.btn-sm {
+	@apply rounded-lg px-3 py-1.5 text-sm;
+}
+
+/* Hr */
+
+hr {
+	@apply my-5 border-t-2 border-gray-200;
+}
+
+.datatable-wrapper {
+	@apply rounded-base bg-one p-3;
+}
+
+.datatable {
+	display: table;
+	width: 100%;
+	border-collapse: collapse;
+	border-radius: var(--radius-base);
+	font-size: 0.85rem;
+}
+.datatable table {
+	width: 100%;
+	border-collapse: collapse;
+	border-radius: var(--radius-base);
+}
+.datatable .tr {
+	display: table-row;
+}
+.datatable .td,
+.datatable .th {
+	font-weight: 400;
+	transition-property:
+		color, background-color, border-color, text-decoration-color, fill, stroke;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+	white-space: nowrap;
+	box-sizing: border-box;
+	display: table-cell;
+	border-color: var(--color-one);
+	border-bottom-width: 5px;
+	padding: 0.4rem 1rem;
+	text-align: center;
+	vertical-align: middle;
+}
+.datatable .td {
+	@apply bg-slate-50;
+}
+.datatable .tr:hover .td {
+	background-color: var(--color-one);
+	cursor: pointer;
+}
+.datatable .th {
+	font-weight: 300;
+	transition-property:
+		color, background-color, border-color, text-decoration-color, fill, stroke;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+	white-space: nowrap;
+	box-sizing: border-box;
+	display: table-cell;
+	padding: 0.2rem 1rem;
+	text-align: center;
+	vertical-align: middle;
+}
+.datatable .th {
+	padding: 0.1rem 1rem;
+}
+
+.datatable .th:first-child,
+.datatable .td:first-child {
+	text-align: left;
+	@apply rounded-l-lg pl-4;
+}
+
+.datatable .td:last-child {
+	@apply rounded-r-lg pr-4;
+}
+
+/* Post */
+
+.post-content,
+.ql-editor {
+	margin-top: 0.5rem !important;
+	line-height: 1.5 !important;
+}
+
+.post-content h1,
+.ql-editor h1 {
+	font-weight: 600 !important;
+	font-size: 1.6rem !important;
+	line-height: 2 !important;
+}
+
+.post-content h2,
+.ql-editor h2 {
+	font-weight: 600 !important;
+	font-size: 1.3rem !important;
+	line-height: 2 !important;
+	margin-top: 1rem !important;
+	margin-bottom: 0.5rem !important;
+}
+
+.post-content h3,
+.ql-editor h3 {
+	font-weight: 600 !important;
+	font-size: 1.1rem !important;
+	line-height: 2 !important;
+	margin-top: 1.2rem !important;
+	margin-bottom: 0.5rem !important;
+	border-bottom: 2px solid var(--color-gray-300);
+	display: inline-block;
+	width: fit-content;
+}
+
+.post-content p,
+.post-content ul,
+.post-content ol,
+.ql-editor p,
+.ql-editor ul,
+.ql-editor ol {
+	line-height: 1.7 !important;
+	color: var(--color-gray-600) !important;
+}
+
+/* Skrýt vnitřní číslování Quillu */
+.post-content .ql-editor,
+.ql-editor .ql-ui {
+	display: none !important;
+}
+
+.post-content ol,
+.post-content ul,
+.ql-editor ol,
+.ql-editor ul {
+	margin-left: 0 !important;
+}
+
+/* VŠECHNY seznamy – základní styl */
+.post-content li[data-list],
+.ql-editor li[data-list] {
+	position: relative !important;
+}
+
+/* Odrážky (disc) */
+.post-content li,
+.ql-editor li {
+	list-style-type: disc;
+	list-style-position: outside;
+	padding-left: 0.2rem !important;
+	margin-left: 0 !important;
+	display: list-item;
+}
+
+/* Odrážky (disc) */
+.post-content li[data-list="bullet"],
+.ql-editor li[data-list="bullet"] {
+	list-style-type: disc;
+	list-style-position: outside;
+	padding-left: 0.2rem !important;
+	margin-left: 0 !important;
+	display: list-item;
+}
+
+/* Číslování */
+.post-content li[data-list="ordered"],
+.ql-editor li[data-list="ordered"] {
+	list-style-type: decimal;
+	list-style-position: outside;
+	padding-left: 0.2rem !important;
+	margin-left: 0 !important;
+	display: list-item;
+}

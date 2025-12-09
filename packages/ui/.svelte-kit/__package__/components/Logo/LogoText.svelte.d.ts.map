@@ -1,0 +1,1 @@
+{"version":3,"file":"LogoText.svelte.d.ts","sourceRoot":"","sources":["../../../src/components/Logo/LogoText.svelte.ts"],"names":[],"mappings":"AAME,KAAK,KAAK,GAAG;IACX,GAAG,EAAE,MAAM,CAAC;IACZ,IAAI,EAAE,MAAM,CAAC;IACb,IAAI,CAAC,EAAE,MAAM,CAAC;CACf,CAAC;AAeJ,QAAA,MAAM,QAAQ,2CAAwC,CAAC;AACvD,KAAK,QAAQ,GAAG,UAAU,CAAC,OAAO,QAAQ,CAAC,CAAC;AAC5C,eAAe,QAAQ,CAAC"}

@@ -1,15 +1,10 @@
 {
-  "extends": "@taxi/config/tsconfig.base.json",
-  "compilerOptions": {
-    "composite": true,
-    "outDir": "dist",
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    },
-    "jsx": "react-jsx",
-    "strictNullChecks": true
-  }
+	"extends": "@taxi/config/tsconfig.base.json",
+	"compilerOptions": {
+		"composite": true,
+		"outDir": "dist",
+		"baseUrl": ".",
+		"jsx": "react-jsx",
+		"strictNullChecks": true
+	}
 }

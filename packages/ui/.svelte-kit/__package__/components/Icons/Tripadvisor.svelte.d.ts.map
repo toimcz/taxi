@@ -1,0 +1,1 @@
+{"version":3,"file":"Tripadvisor.svelte.d.ts","sourceRoot":"","sources":["../../../src/components/Icons/Tripadvisor.svelte.ts"],"names":[],"mappings":"AAGA,KAAK,KAAK,GAAG;IACZ,IAAI,CAAC,EAAE,MAAM,CAAC;IACd,IAAI,CAAC,EAAE,MAAM,CAAC;CACd,CAAC;AAWF,QAAA,MAAM,WAAW,2CAAwC,CAAC;AAC1D,KAAK,WAAW,GAAG,UAAU,CAAC,OAAO,WAAW,CAAC,CAAC;AAClD,eAAe,WAAW,CAAC"}

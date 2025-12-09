@@ -1,33 +1,35 @@
 {
-  "name": "@taxi/db",
-  "type": "module",
-  "exports": {
-    ".": {
-      "default": "./src/index.ts"
-    },
-    "./*": {
-      "default": "./src/*.ts"
-    }
-  },
-  "scripts": {
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
-  },
-  "devDependencies": {
-    "drizzle-kit": "^0.31.8",
-    "@types/ws": "^8.18.1",
-    "@taxi/config": "workspace:*"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  },
-  "dependencies": {
-    "drizzle-orm": "^0.45.0",
-    "@neondatabase/serverless": "^1.0.2",
-    "ws": "^8.18.3",
-    "dotenv": "catalog:",
-    "zod": "catalog:"
-  }
+	"name": "@taxi/db",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./*": {
+			"default": "./src/*.ts"
+		}
+	},
+	"scripts": {
+		"db:push": "drizzle-kit push",
+		"db:studio": "drizzle-kit studio",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate"
+	},
+	"devDependencies": {
+		"drizzle-kit": "^0.31.8",
+		"@types/ws": "^8.18.1",
+		"@taxi/config": "workspace:*"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"dependencies": {
+		"@foundernest/namecase": "^1.0.5",
+		"@neondatabase/serverless": "^1.0.2",
+		"@taxi/contracts": "workspace:*",
+		"dotenv": "catalog:",
+		"drizzle-orm": "catalog:",
+		"ws": "^8.18.3",
+		"zod": "catalog:"
+	}
 }

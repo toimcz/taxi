@@ -1,0 +1,22 @@
+{
+	"name": "@taxi/contracts",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./*": {
+			"default": "./src/*.ts"
+		}
+	},
+	"scripts": {},
+	"devDependencies": {
+		"@taxi/config": "workspace:*"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"dependencies": {
+		"valibot": "^1.2.0"
+	}
+}

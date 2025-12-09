@@ -1,0 +1,26 @@
+{
+	"name": "@taxi/utils",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./*": {
+			"default": "./src/*.ts"
+		}
+	},
+	"scripts": {},
+	"devDependencies": {
+		"@taxi/config": "workspace:*"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"dependencies": {
+		"@foundernest/namecase": "^1.0.5",
+		"clsx": "^2.1.1",
+		"slugify": "^1.6.6",
+		"tailwind-merge": "^3.3.1",
+		"valibot": "catalog:"
+	}
+}

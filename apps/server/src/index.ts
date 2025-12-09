@@ -1,9 +1,39 @@
 import "dotenv/config";
-import { Elysia } from "elysia";
+import { join } from "node:path";
 import { cors } from "@elysiajs/cors";
 import { auth } from "@taxi/auth";
+import { logger } from "@taxi/logger";
+import { Elysia } from "elysia";
+import { apiHandler } from "src/api/handler";
 
-const app = new Elysia()
+// Get absolute path to cert directory (project root)
+const certPath = join(import.meta.dir, "../../../cert");
+const certFile = join(certPath, "localhost.pem");
+const keyFile = join(certPath, "localhost-key.pem");
+
+// Verify certificates exist
+try {
+	const certExists = await Bun.file(certFile).exists();
+	const keyExists = await Bun.file(keyFile).exists();
+	if (!(certExists && keyExists)) {
+		logger.warn(
+			`⚠️  Certificate files not found at ${certPath}. Server will not use HTTPS.`,
+		);
+	}
+} catch (error) {
+	logger.warn(
+		`⚠️  Could not verify certificates: ${error}. Server will not use HTTPS.`,
+	);
+}
+
+const app = new Elysia({
+	serve: {
+		tls: {
+			cert: Bun.file(certFile),
+			key: Bun.file(keyFile),
+		},
+	},
+})
 	.use(
 		cors({
 			origin: process.env.CORS_ORIGIN || "",
@@ -12,14 +42,11 @@ const app = new Elysia()
 			credentials: true,
 		}),
 	)
-	.all("/api/auth/*", async (context) => {
-		const { request, status } = context;
-		if (["POST", "GET"].includes(request.method)) {
-			return auth.handler(request);
-		}
-		return status(405);
-	})
+	.mount(auth.handler)
+	.use(apiHandler)
 	.get("/", () => "OK")
-	.listen(3000, () => {
-		console.log("Server is running on http://localhost:3000");
+	.listen(4000, ({ hostname, port }) => {
+		logger.info(`Server is running on https://${hostname}:${port}`);
 	});
+
+export type App = typeof app;

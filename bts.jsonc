@@ -2,28 +2,21 @@
 // safe to delete
 
 {
-  "$schema": "https://r2.better-t-stack.dev/schema.json",
-  "version": "3.7.3",
-  "createdAt": "2025-12-08T17:09:29.818Z",
-  "database": "postgres",
-  "orm": "drizzle",
-  "backend": "elysia",
-  "runtime": "bun",
-  "frontend": [
-    "svelte"
-  ],
-  "addons": [
-    "biome",
-    "ruler",
-    "turborepo",
-    "ultracite"
-  ],
-  "examples": [],
-  "auth": "better-auth",
-  "payments": "none",
-  "packageManager": "bun",
-  "dbSetup": "neon",
-  "api": "none",
-  "webDeploy": "none",
-  "serverDeploy": "none"
+	"$schema": "https://r2.better-t-stack.dev/schema.json",
+	"version": "3.7.3",
+	"createdAt": "2025-12-08T17:09:29.818Z",
+	"database": "postgres",
+	"orm": "drizzle",
+	"backend": "elysia",
+	"runtime": "bun",
+	"frontend": ["svelte"],
+	"addons": ["biome", "ruler", "turborepo", "ultracite"],
+	"examples": [],
+	"auth": "better-auth",
+	"payments": "none",
+	"packageManager": "bun",
+	"dbSetup": "neon",
+	"api": "none",
+	"webDeploy": "none",
+	"serverDeploy": "none"
 }

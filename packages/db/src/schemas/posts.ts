@@ -59,7 +59,7 @@ import {
 	uuid,
 	varchar,
 } from "drizzle-orm/pg-core";
-import { postCategories$, users } from ".";
+import { postCategories$, users$ } from ".";
 import { defaultColumns, primaryUUID } from "./_custom-types";
 
 /**
@@ -111,15 +111,15 @@ export const posts$ = pgTable(
 		/** @description Reference to the user who created the post */
 		createdById: uuid("created_by_id")
 			.notNull()
-			.references(() => users.id, { onDelete: "cascade" }),
+			.references(() => users$.id, { onDelete: "cascade" }),
 
 		/** @description Reference to the user who last updated the post */
 		updatedById: uuid("updated_by_id")
 			.notNull()
-			.references(() => users.id, { onDelete: "cascade" }),
+			.references(() => users$.id, { onDelete: "cascade" }),
 
 		/** @description Reference to the user who deleted the post */
-		deletedById: uuid("deleted_by_id").references(() => users.id, {
+		deletedById: uuid("deleted_by_id").references(() => users$.id, {
 			onDelete: "cascade",
 		}),
 	},
@@ -173,23 +173,23 @@ export const postsRelations = relations(posts$, ({ one }) => ({
 	}),
 
 	/** @description The user who created this post */
-	createdBy: one(users, {
+	createdBy: one(users$, {
 		fields: [posts$.createdById],
-		references: [users.id],
+		references: [users$.id],
 		relationName: POST_CREATED_BY,
 	}),
 
 	/** @description The user who last updated this post */
-	updatedBy: one(users, {
+	updatedBy: one(users$, {
 		fields: [posts$.updatedById],
-		references: [users.id],
+		references: [users$.id],
 		relationName: POST_UPDATED_BY,
 	}),
 
 	/** @description The user who deleted this post */
-	deletedBy: one(users, {
+	deletedBy: one(users$, {
 		fields: [posts$.deletedById],
-		references: [users.id],
+		references: [users$.id],
 		relationName: POST_DELETED_BY,
 	}),
 }));

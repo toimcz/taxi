@@ -1,26 +1,26 @@
 <script lang="ts">
-  import { Facebook, Google, Instagram } from '@taxi/ui';
-  import { page } from '$app/state';
-  import {
-    PUBLIC_APP_EMAIL,
-    PUBLIC_APP_PHONE,
-    PUBLIC_APP_SLOGAN,
-    PUBLIC_SOCIAL_FACEBOOK_URL,
-    PUBLIC_SOCIAL_GOOGLE_URL,
-    PUBLIC_SOCIAL_INSTAGRAM_URL,
-  } from '$env/static/public';
-  import { LogoText } from '$lib/components/Logo';
+import { Facebook, Google, Instagram } from "@taxi/ui";
+import { page } from "$app/state";
+import {
+	PUBLIC_APP_EMAIL,
+	PUBLIC_APP_PHONE,
+	PUBLIC_APP_SLOGAN,
+	PUBLIC_SOCIAL_FACEBOOK_URL,
+	PUBLIC_SOCIAL_GOOGLE_URL,
+	PUBLIC_SOCIAL_INSTAGRAM_URL,
+} from "$env/static/public";
+import { LogoText } from "$lib/components/Logo";
 
-  type Page = {
-    title: string;
-    slug: string;
-  };
+type Page = {
+	title: string;
+	slug: string;
+};
 
-  type Props = {
-    pages: Page[];
-  };
+type Props = {
+	pages: Page[];
+};
 
-  let { pages }: Props = $props();
+let { pages }: Props = $props();
 </script>
 
 <footer class="mt-10 bg-white px-7 py-5 print:hidden">

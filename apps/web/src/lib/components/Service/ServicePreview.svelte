@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { CardLink } from '@taxi/ui';
+import { CardLink } from "@taxi/ui";
 
-  type Props = {
-    service: {
-      title: string;
-      slug: string;
-      photo: string;
-      description: string;
-    };
-  };
+type Props = {
+	service: {
+		title: string;
+		slug: string;
+		photo: string;
+		description: string;
+	};
+};
 
-  const { service }: Props = $props();
+const { service }: Props = $props();
 </script>
 
 <CardLink title={service.title} href="/sluzby/{service.slug}">

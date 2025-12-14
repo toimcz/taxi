@@ -102,3 +102,5 @@ export const closeCacheConnection = async () => {
 		throw error;
 	}
 };
+
+export type CacheClient = typeof cache;

@@ -17,6 +17,7 @@
 		"typescript": "^5"
 	},
 	"dependencies": {
+		"libphonenumber-js": "^1.12.31",
 		"valibot": "^1.2.0"
 	}
 }

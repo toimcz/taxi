@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { cn } from '@taxi/utils';
+import { cn } from "@taxi/utils";
 
-  type Props = {
-    class?: string;
-  };
+type Props = {
+	class?: string;
+};
 
-  let { class: className }: Props = $props();
+let { class: className }: Props = $props();
 </script>
 
 <img src="/images/logo.png" alt="logo" class={cn('h-18 w-18', className)} />

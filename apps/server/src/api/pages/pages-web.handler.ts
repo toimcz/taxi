@@ -1,10 +1,14 @@
-import { ErrorResponse, PaginationParamsInput } from "@taxi/contracts/common";
+import {
+	NotFoundResponse,
+	PaginationParamsInput,
+} from "@taxi/contracts/common";
 import { PageFindBySlugInput } from "@taxi/contracts/pages/input";
-import { PageFindBySlug } from "@taxi/contracts/pages/output";
+import { PageFindBySlug, PageItem } from "@taxi/contracts/pages/output";
 import { db } from "@taxi/db";
 import { pages$ } from "@taxi/db/schemas/pages";
 import { and, asc, eq } from "drizzle-orm";
 import { Elysia } from "elysia";
+import { array } from "valibot";
 
 export const pagesWebHandler = new Elysia({
 	prefix: "pages",
@@ -13,8 +17,9 @@ export const pagesWebHandler = new Elysia({
 	.get(
 		"/top",
 		({ query }) => {
-			const limit = query?.limit ?? 9;
-			const offset = query?.page ? (query.page - 1) * limit : 0;
+			const limit = Number(query?.limit ?? 9);
+			const page = Number(query?.page ?? 1);
+			const offset = page ? (page - 1) * limit : 0;
 			return db
 				.select({
 					id: pages$.id,
@@ -30,13 +35,17 @@ export const pagesWebHandler = new Elysia({
 		},
 		{
 			query: PaginationParamsInput,
+			response: {
+				200: array(PageItem),
+			},
 		},
 	)
 	.get(
 		"/bottom",
 		async ({ query }) => {
-			const limit = query?.limit ?? 9;
-			const offset = query?.page ? (query.page - 1) * limit : 0;
+			const limit = Number(query?.limit ?? 9);
+			const page = Number(query?.page ?? 1);
+			const offset = page ? (page - 1) * limit : 0;
 			return await db
 				.select({
 					id: pages$.id,
@@ -52,6 +61,9 @@ export const pagesWebHandler = new Elysia({
 		},
 		{
 			query: PaginationParamsInput,
+			response: {
+				200: array(PageItem),
+			},
 		},
 	)
 	.get(
@@ -77,7 +89,7 @@ export const pagesWebHandler = new Elysia({
 			params: PageFindBySlugInput,
 			response: {
 				200: PageFindBySlug,
-				404: ErrorResponse,
+				404: NotFoundResponse,
 			},
 		},
 	);

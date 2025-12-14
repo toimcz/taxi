@@ -1,0 +1,33 @@
+import { json } from "@sveltejs/kit";
+import { RegisterPasswordInput } from "@taxi/contracts/auth/auth.input";
+import { safeParse } from "valibot";
+import { auth } from "$lib/server/api.js";
+
+export const POST = async ({ request }) => {
+	const body = await request.json();
+	const validated = safeParse(RegisterPasswordInput, body);
+	if (!validated.success) {
+		return json(
+			{
+				success: false,
+				message: "Chyba ve formuláři",
+				issues: validated.issues,
+			},
+			{ status: 400 },
+		);
+	}
+	const { data, error } = await auth().register.password.post(validated.output);
+	if (error) {
+		if (error.status === 409) {
+			return json(
+				{ success: false, message: "Uživatel již existuje" },
+				{ status: 409 },
+			);
+		}
+		return json(
+			{ success: false, message: "Chyba při registraci" },
+			{ status: 500 },
+		);
+	}
+	return json({ success: true, message: data.message });
+};

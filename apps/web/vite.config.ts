@@ -7,10 +7,10 @@ export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
 	server: {
 		proxy: {
-			"/api/auth": {
+			"/api": {
 				target: "https://localhost:4000",
 				changeOrigin: true,
-				secure: false,
+				secure: true,
 			},
 		},
 		...(process.env.NODE_ENV === "production"

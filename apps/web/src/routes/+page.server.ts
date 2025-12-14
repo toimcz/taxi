@@ -1,5 +1,5 @@
 import { error } from "@sveltejs/kit";
-import { client } from "$lib/client";
+import { api } from "$lib/server/api";
 
 const items = [
 	{
@@ -24,9 +24,9 @@ const items = [
 
 export const load = async () => {
 	const [posts, services, routes] = await Promise.all([
-		client.posts.allPublished.get(),
-		client.services.allActive.get(),
-		client.routes.allActive.get(),
+		api().posts.allPublished.get({ query: { limit: "9", page: "1" } }),
+		api().services.allActive.get(),
+		api().routes.allActive.get({ query: { limit: "9", page: "1" } }),
 	]);
 
 	if (posts.error || services.error || routes.error) {

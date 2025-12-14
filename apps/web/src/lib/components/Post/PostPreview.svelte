@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { MoveRight } from '@lucide/svelte';
-  import { CardLink } from '@taxi/ui';
+import { MoveRight } from "@lucide/svelte";
+import { CardLink } from "@taxi/ui";
 
-  type Props = {
-    post: {
-      title: string;
-      slug: string;
-      photo: string;
-      description: string;
-      categorySlug: string;
-    };
-  };
+type Props = {
+	post: {
+		title: string;
+		slug: string;
+		photo: string;
+		description: string;
+		categorySlug: string;
+	};
+};
 
-  const { post }: Props = $props();
+const { post }: Props = $props();
 </script>
 
 <CardLink href="/blog/{post.categorySlug}/{post.slug}" title={post.title}>

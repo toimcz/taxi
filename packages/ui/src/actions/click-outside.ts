@@ -1,6 +1,8 @@
 import type { Action } from "svelte/action";
 
-export const clickOutside: Action<HTMLDivElement> = (node) => {
+export const clickOutside: Action<HTMLDivElement | HTMLButtonElement> = (
+	node,
+) => {
 	const handleClick = (event: MouseEvent) => {
 		if (
 			node &&

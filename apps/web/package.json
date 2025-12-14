@@ -21,11 +21,9 @@
 		"@tailwindcss/vite": "^4.1.12",
 		"@taxi/config": "workspace:*",
 		"@taxi/ui": "workspace:*",
-		"clsx": "^2.1.1",
 		"svelte": "^5.38.1",
 		"svelte-check": "^4.3.1",
 		"svelte-popperjs": "^1.3.2",
-		"tailwind-merge": "^3.4.0",
 		"tailwindcss": "^4.1.12",
 		"typescript": "^5.9.2",
 		"vite": "^7.1.2"
@@ -34,7 +32,6 @@
 		"@elysiajs/eden": "catalog:",
 		"@lucide/svelte": "^0.556.0",
 		"@tanstack/svelte-form": "^1.19.2",
-		"@taxi/auth": "workspace:*",
 		"@taxi/contracts": "workspace:*",
 		"@taxi/logger": "workspace:*",
 		"@taxi/server": "workspace:*",
@@ -43,6 +40,6 @@
 		"date-fns": "^4.1.0",
 		"slugify": "^1.6.6",
 		"uuid": "^13.0.0",
-		"valibot": "^1.2.0"
+		"valibot": "catalog:"
 	}
 }

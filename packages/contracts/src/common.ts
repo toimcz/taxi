@@ -1,29 +1,101 @@
-import { type InferInput, number, object, optional, string } from "valibot";
+import {
+	boolean,
+	type InferInput,
+	type InferOutput,
+	literal,
+	number,
+	object,
+	optional,
+	pipe,
+	string,
+	uuid,
+} from "valibot";
+
+export const ParamUUID = object({
+	id: pipe(string(), uuid()),
+});
+
+export type ParamUUID = InferInput<typeof ParamUUID>;
 
 export const PaginationParamsInput = object({
-	page: optional(number()),
-	limit: optional(number()),
+	page: optional(string()),
+	limit: optional(string()),
 });
 
 export type PaginationParamsInput = InferInput<typeof PaginationParamsInput>;
 
-export const ErrorResponse = object({
-	status: number(),
+export const NotFoundResponse = object({
+	status: literal(404),
 	message: string(),
 });
 
-export type ErrorResponse = InferInput<typeof ErrorResponse>;
+export type NotFoundResponse = InferInput<typeof NotFoundResponse>;
 
-export type BillingDetail = {
-	name: string;
-	company: string;
-	street: string;
-	city: string;
-	zip: string;
-	country: string;
-	ic: string;
-	dic: string;
-};
+export const UnauthorizedResponse = object({
+	status: literal(401),
+	message: string(),
+});
+
+export type UnauthorizedResponse = InferInput<typeof UnauthorizedResponse>;
+
+export const ConflictResponse = object({
+	status: literal(409),
+	message: string(),
+});
+
+export type ConflictResponse = InferInput<typeof ConflictResponse>;
+
+export const BadRequestResponse = object({
+	status: literal(400),
+	message: string(),
+});
+
+export type BadRequestResponse = InferInput<typeof BadRequestResponse>;
+
+export const InternalServerErrorResponse = object({
+	status: literal(500),
+	message: string(),
+});
+
+export type InternalServerErrorResponse = InferInput<
+	typeof InternalServerErrorResponse
+>;
+
+export const PaginationMeta = object({
+	total: number(),
+	page: number(),
+	limit: optional(number()),
+	totalPages: number(),
+});
+export type PaginationMeta = InferOutput<typeof PaginationMeta>;
+
+export const SuccessResponse = object({
+	success: boolean(),
+	message: string(),
+});
+
+export type SuccessResponse = InferOutput<typeof SuccessResponse>;
+
+export const BillingDetail = object({
+	name: string(),
+	company: string(),
+	street: string(),
+	city: string(),
+	zip: string(),
+	country: string(),
+	ic: string(),
+	dic: string(),
+});
+export type BillingDetail = InferOutput<typeof BillingDetail>;
+
+export const IdentityType = {
+	EMAIL: "email",
+	GOOGLE: "google",
+	MAGIC: "magic",
+	PASSWORD: "password",
+} as const;
+export type IdentityType = (typeof IdentityType)[keyof typeof IdentityType];
+
 export const Role = {
 	USER: "user",
 	ADMIN: "admin",

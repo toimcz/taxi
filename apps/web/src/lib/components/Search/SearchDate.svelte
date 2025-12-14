@@ -1,21 +1,21 @@
 <script lang="ts">
-  import { Calendar } from '@lucide/svelte';
-  import { Datepicker } from '@taxi/ui';
-  import SearchInput from './SearchInput.svelte';
+import { Calendar } from "@lucide/svelte";
+import { Datepicker } from "@taxi/ui";
+import SearchInput from "./SearchInput.svelte";
 
-  type Props = {
-    id: string;
-    name: string;
-    value: string;
-    error?: boolean;
-  };
+type Props = {
+	id: string;
+	name: string;
+	value: string;
+	error?: boolean;
+};
 
-  let { id, name, value = $bindable(''), error = false }: Props = $props();
+let { id, name, value = $bindable(""), error = false }: Props = $props();
 
-  function setDate(v: string) {
-    value = v;
-    error = false;
-  }
+function setDate(v: string) {
+	value = v;
+	error = false;
+}
 </script>
 
 <SearchInput {id} label="Datum" {error}>

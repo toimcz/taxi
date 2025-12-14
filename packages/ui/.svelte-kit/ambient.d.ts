@@ -26,6 +26,7 @@
  * ```
  */
 declare module '$env/static/private' {
+	export const VSCODE_GIT_IPC_AUTH_TOKEN: string;
 	export const TERM_PROGRAM: string;
 	export const NODE: string;
 	export const TERM: string;
@@ -86,6 +87,7 @@ declare module '$env/static/public' {
  */
 declare module '$env/dynamic/private' {
 	export const env: {
+		VSCODE_GIT_IPC_AUTH_TOKEN: string;
 		TERM_PROGRAM: string;
 		NODE: string;
 		TERM: string;

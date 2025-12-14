@@ -1,124 +1,124 @@
 <script lang="ts">
-  import { CircleMinus, CirclePlus, Users } from '@lucide/svelte';
-  import { onMount } from 'svelte';
-  import SearchInput from './SearchInput.svelte';
+import { CircleMinus, CirclePlus, Users } from "@lucide/svelte";
+import { onMount } from "svelte";
+import SearchInput from "./SearchInput.svelte";
 
-  type Props = {
-    id: string;
-    adults: number;
-    children: number;
-    infants: number;
-    error?: boolean;
-  };
+type Props = {
+	id: string;
+	adults: number;
+	children: number;
+	infants: number;
+	error?: boolean;
+};
 
-  let {
-    id,
-    adults = $bindable(0),
-    children = $bindable(0),
-    infants = $bindable(0),
-    error = false,
-  }: Props = $props();
+let {
+	id,
+	adults = $bindable(0),
+	children = $bindable(0),
+	infants = $bindable(0),
+	error = false,
+}: Props = $props();
 
-  let showPassengers = $state(false);
+let showPassengers = $state(false);
 
-  $effect(() => {
-    if (adults || children || infants) {
-      error = false;
-    }
-  });
+$effect(() => {
+	if (adults || children || infants) {
+		error = false;
+	}
+});
 
-  let adultesText = $derived(() => {
-    switch (adults) {
-      case 1:
-        return 'dospělý';
-      case 2:
-      case 3:
-      case 4:
-        return 'dospělí';
-      default:
-        return 'dospělých';
-    }
-  });
+let adultesText = $derived(() => {
+	switch (adults) {
+		case 1:
+			return "dospělý";
+		case 2:
+		case 3:
+		case 4:
+			return "dospělí";
+		default:
+			return "dospělých";
+	}
+});
 
-  let childrenText = $derived(() => {
-    switch (children) {
-      case 1:
-        return 'dítě';
-      case 2:
-      case 3:
-      case 4:
-        return 'děti';
-      default:
-        return 'dětí';
-    }
-  });
+let childrenText = $derived(() => {
+	switch (children) {
+		case 1:
+			return "dítě";
+		case 2:
+		case 3:
+		case 4:
+			return "děti";
+		default:
+			return "dětí";
+	}
+});
 
-  let infantsText = $derived(() => {
-    switch (infants) {
-      case 1:
-        return 'batole';
-      case 2:
-      case 3:
-      case 4:
-        return 'batolata';
-      default:
-        return 'batolat';
-    }
-  });
+let infantsText = $derived(() => {
+	switch (infants) {
+		case 1:
+			return "batole";
+		case 2:
+		case 3:
+		case 4:
+			return "batolata";
+		default:
+			return "batolat";
+	}
+});
 
-  function togglePassengers() {
-    showPassengers = !showPassengers;
-  }
+function togglePassengers() {
+	showPassengers = !showPassengers;
+}
 
-  function decreaseAdults() {
-    if (adults > 0) {
-      adults--;
-    }
-  }
+function decreaseAdults() {
+	if (adults > 0) {
+		adults--;
+	}
+}
 
-  function increaseAdults() {
-    if (adults < 19) {
-      adults++;
-    }
-  }
+function increaseAdults() {
+	if (adults < 19) {
+		adults++;
+	}
+}
 
-  function decreaseChildren() {
-    if (children > 0) {
-      children--;
-    }
-  }
+function decreaseChildren() {
+	if (children > 0) {
+		children--;
+	}
+}
 
-  function increaseChildren() {
-    if (children < 19) {
-      children++;
-    }
-  }
+function increaseChildren() {
+	if (children < 19) {
+		children++;
+	}
+}
 
-  function decreaseInfants() {
-    if (infants > 0) {
-      infants--;
-    }
-  }
+function decreaseInfants() {
+	if (infants > 0) {
+		infants--;
+	}
+}
 
-  function increaseInfants() {
-    if (infants < 3) {
-      infants++;
-    }
-  }
+function increaseInfants() {
+	if (infants < 3) {
+		infants++;
+	}
+}
 
-  function handleClickOutside(event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.passengers-container') && showPassengers) {
-      showPassengers = false;
-    }
-  }
+function handleClickOutside(event: MouseEvent) {
+	const target = event.target as HTMLElement;
+	if (!target.closest(".passengers-container") && showPassengers) {
+		showPassengers = false;
+	}
+}
 
-  onMount(() => {
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  });
+onMount(() => {
+	document.addEventListener("click", handleClickOutside);
+	return () => {
+		document.removeEventListener("click", handleClickOutside);
+	};
+});
 </script>
 
 <SearchInput {id} label="Počet osob" {error}>

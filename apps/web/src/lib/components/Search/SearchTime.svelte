@@ -1,25 +1,25 @@
 <script lang="ts">
-  import { TimerIcon } from '@lucide/svelte';
-  import SearchInput from './SearchInput.svelte';
+import { TimerIcon } from "@lucide/svelte";
+import SearchInput from "./SearchInput.svelte";
 
-  type Props = {
-    id: string;
-    name: string;
-    value: string;
-    error?: boolean;
-  };
+type Props = {
+	id: string;
+	name: string;
+	value: string;
+	error?: boolean;
+};
 
-  let { id, name, value = $bindable(''), error = false }: Props = $props();
+let { id, name, value = $bindable(""), error = false }: Props = $props();
 
-  const setTime = (v: string) => {
-    value = v;
-    error = false;
-  };
+const setTime = (v: string) => {
+	value = v;
+	error = false;
+};
 
-  function handleTimeChange(event: Event) {
-    const target = event.target as HTMLInputElement;
-    setTime(target.value);
-  }
+function handleTimeChange(event: Event) {
+	const target = event.target as HTMLInputElement;
+	setTime(target.value);
+}
 </script>
 
 <SearchInput {id} label="Čas odjezdu/příletu" {error}>

@@ -1,18 +1,23 @@
 <script lang="ts">
-  import { MoveVertical } from '@lucide/svelte';
-  import { enhance } from '$app/forms';
-  import { SubmitButton } from '$lib/components/Button';
-  import { SearchDate, SearchPassengers, SearchPlace, SearchTime } from '$lib/components/Search';
-  import { useForm } from '$lib/hooks/use-form.svelte';
-  import { useSearchStore } from '$lib/stores/search.svelte';
+import { MoveVertical } from "@lucide/svelte";
+import { enhance } from "$app/forms";
+import { SubmitButton } from "$lib/components/Button";
+import {
+	SearchDate,
+	SearchPassengers,
+	SearchPlace,
+	SearchTime,
+} from "$lib/components/Search";
+import { useForm } from "$lib/hooks/use-form.svelte";
+import { useSearchStore } from "$lib/stores/search.svelte";
 
-  const searchStore = useSearchStore();
+const searchStore = useSearchStore();
 
-  const { submit, issues, processing } = useForm({
-    onSuccess() {
-      console.log('test');
-    },
-  });
+const { submit, issues, processing } = useForm({
+	onSuccess() {
+		console.log("test");
+	},
+});
 </script>
 
 <div class="container">

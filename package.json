@@ -15,8 +15,7 @@
 			"@ai-sdk/google": "^2.0.13",
 			"dotenv": "^17.2.2",
 			"drizzle-orm": "^0.44.2",
-			"valibot": "^1.1.0",
-			"zod": "^4.1.13"
+			"valibot": "^1.2.0"
 		}
 	},
 	"scripts": {

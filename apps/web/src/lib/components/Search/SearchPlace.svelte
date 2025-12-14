@@ -1,27 +1,33 @@
 <script lang="ts">
-  import { MapPin } from '@lucide/svelte';
-  import { Autocomplete } from '.';
-  import SearchInput from './SearchInput.svelte';
+import { MapPin } from "@lucide/svelte";
+import { Autocomplete } from ".";
+import SearchInput from "./SearchInput.svelte";
 
-  type Props = {
-    id: string;
-    name: string;
-    value: string;
-    placeId?: string;
-    error?: boolean;
-  };
+type Props = {
+	id: string;
+	name: string;
+	value: string;
+	placeId?: string;
+	error?: boolean;
+};
 
-  let { id, name, value = $bindable(''), placeId = $bindable(), error = false }: Props = $props();
+let {
+	id,
+	name,
+	value = $bindable(""),
+	placeId = $bindable(),
+	error = false,
+}: Props = $props();
 
-  function setValue(v: string) {
-    value = v;
-    error = false;
-  }
+function setValue(v: string) {
+	value = v;
+	error = false;
+}
 
-  function setPlaceId(pi: string) {
-    placeId = pi;
-    error = false;
-  }
+function setPlaceId(pi: string) {
+	placeId = pi;
+	error = false;
+}
 </script>
 
 <SearchInput id="from" label="Odkud" {error}>

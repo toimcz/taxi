@@ -1,10 +1,10 @@
 import { error } from "@sveltejs/kit";
-import { client } from "$lib/client";
+import { api } from "$lib/server/api.js";
 
-export const load = async () => {
+export const load = async ({ locals }) => {
 	const [topPages, bottomPages] = await Promise.all([
-		client.pages.top.get(),
-		client.pages.bottom.get(),
+		api().pages.top.get(),
+		api().pages.bottom.get(),
 	]);
 
 	if (topPages.error || bottomPages.error) {
@@ -14,5 +14,6 @@ export const load = async () => {
 	return {
 		topPages: topPages.data,
 		bottomPages: bottomPages.data,
+		isAuthenticated: locals.isAuthenticated,
 	};
 };

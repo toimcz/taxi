@@ -1,0 +1,23 @@
+{
+	"name": "@taxi/brevo",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./*": {
+			"default": "./src/*.ts"
+		}
+	},
+	"scripts": {},
+	"devDependencies": {
+		"@taxi/config": "workspace:*"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"dependencies": {
+		"@getbrevo/brevo": "^3.0.1",
+		"@taxi/logger": "workspace:*"
+	}
+}

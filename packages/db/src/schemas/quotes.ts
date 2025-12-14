@@ -8,7 +8,7 @@ import {
 	uuid,
 } from "drizzle-orm/pg-core";
 import { defaultColumns, primaryUUID } from "./_custom-types";
-import { users } from "./auth";
+import { users$ } from "./auth";
 import { QC_CAR, quoteCars$ } from "./quote-cars";
 import { RIDE_DETAIL_QUOTE, rideDetails$ } from "./ride-details";
 
@@ -27,7 +27,7 @@ export const quotes$ = pgTable(
 		children: smallint("children").notNull(),
 		infants: smallint("infants").notNull(),
 		source: text("source").notNull().default(""),
-		userId: uuid("user_id").references(() => users.id, {
+		userId: uuid("user_id").references(() => users$.id, {
 			onDelete: "set null",
 		}),
 		...defaultColumns,

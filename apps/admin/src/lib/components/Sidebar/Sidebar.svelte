@@ -1,149 +1,149 @@
 <script lang="ts">
-  import {
-    Bolt,
-    BookOpen,
-    Bug,
-    CarTaxiFront,
-    ChevronsLeft,
-    CircleDollarSign,
-    CreditCard,
-    FileUp,
-    Globe,
-    House,
-    LogOut,
-    Mail,
-    MapPinned,
-    MessageCircleQuestionMark,
-    Route,
-    Settings,
-    Users,
-  } from '@lucide/svelte';
-  import type { Role } from '@taxi/contracts/common';
-  import { onMount } from 'svelte';
-  import { enhance } from '$app/forms';
-  import { page } from '$app/state';
-  import Logo from '$lib/components/Logo/Logo.svelte';
+import {
+	Bolt,
+	BookOpen,
+	Bug,
+	CarTaxiFront,
+	ChevronsLeft,
+	CircleDollarSign,
+	CreditCard,
+	FileUp,
+	Globe,
+	House,
+	LogOut,
+	Mail,
+	MapPinned,
+	MessageCircleQuestionMark,
+	Route,
+	Settings,
+	Users,
+} from "@lucide/svelte";
+import type { Role } from "@taxi/contracts/common";
+import { onMount } from "svelte";
+import { enhance } from "$app/forms";
+import { page } from "$app/state";
+import Logo from "$lib/components/Logo/Logo.svelte";
 
-  const ICON_SIZE = 18;
+const ICON_SIZE = 18;
 
-  let open = $state(false);
+let open = $state(false);
 
-  function toggleSidebar() {
-    open = !open;
-  }
+function toggleSidebar() {
+	open = !open;
+}
 
-  onMount(() => {
-    const as = document.querySelectorAll('a');
-    as.forEach((a) => {
-      a.addEventListener('click', () => {
-        open = false;
-      });
-    });
-  });
+onMount(() => {
+	const as = document.querySelectorAll("a");
+	as.forEach((a) => {
+		a.addEventListener("click", () => {
+			open = false;
+		});
+	});
+});
 
-  type AllIcons =
-    | typeof Bolt
-    | typeof BookOpen
-    | typeof Bug
-    | typeof CarTaxiFront
-    | typeof ChevronsLeft
-    | typeof CircleDollarSign
-    | typeof CreditCard
-    | typeof FileUp
-    | typeof House
-    | typeof LogOut
-    | typeof Mail
-    | typeof MapPinned
-    | typeof MessageCircleQuestionMark
-    | typeof Route
-    | typeof Settings
-    | typeof Globe;
+type AllIcons =
+	| typeof Bolt
+	| typeof BookOpen
+	| typeof Bug
+	| typeof CarTaxiFront
+	| typeof ChevronsLeft
+	| typeof CircleDollarSign
+	| typeof CreditCard
+	| typeof FileUp
+	| typeof House
+	| typeof LogOut
+	| typeof Mail
+	| typeof MapPinned
+	| typeof MessageCircleQuestionMark
+	| typeof Route
+	| typeof Settings
+	| typeof Globe;
 
-  type Link = {
-    name: string;
-    href: string;
-    roles?: Role[];
-    icon: AllIcons;
-  };
+type Link = {
+	name: string;
+	href: string;
+	roles?: Role[];
+	icon: AllIcons;
+};
 
-  const links: Link[] = [
-    {
-      name: 'Transfery',
-      href: '/transfery',
-      roles: [],
-      icon: Route,
-    },
-    {
-      name: 'Zákazníci',
-      href: '/zakaznici',
-      icon: Users,
-    },
-    {
-      name: 'Platby',
-      href: '/platby',
-      icon: CircleDollarSign,
-    },
-    {
-      name: 'Dopravci',
-      href: '/dopravci',
-      icon: CarTaxiFront,
-    },
-    {
-      name: 'Emaily',
-      href: '/emaily',
-      icon: Mail,
-    },
-    {
-      name: 'Základny',
-      href: '/zakladny',
-      icon: House,
-    },
-    {
-      name: 'Staty',
-      href: '/staty',
-      icon: Globe,
-    },
-    {
-      name: 'Otázky',
-      href: '/otazky',
-      icon: MessageCircleQuestionMark,
-    },
-    {
-      name: 'Platební metody',
-      href: '/platebni-metody',
-      icon: CreditCard,
-    },
-    {
-      name: 'Články',
-      href: '/clanky',
-      icon: FileUp,
-    },
-    {
-      name: 'Stránky',
-      href: '/stranky',
-      icon: BookOpen,
-    },
-    {
-      name: 'Služby',
-      href: '/sluzby',
-      icon: Bolt,
-    },
-    {
-      name: 'Destinace',
-      href: '/destinace',
-      icon: MapPinned,
-    },
-    {
-      name: 'Nastavení',
-      href: '/nastaveni',
-      icon: Settings,
-    },
-    {
-      name: 'Chyby systému',
-      href: '/chyby',
-      icon: Bug,
-    },
-  ];
+const links: Link[] = [
+	{
+		name: "Transfery",
+		href: "/transfery",
+		roles: [],
+		icon: Route,
+	},
+	{
+		name: "Zákazníci",
+		href: "/zakaznici",
+		icon: Users,
+	},
+	{
+		name: "Platby",
+		href: "/platby",
+		icon: CircleDollarSign,
+	},
+	{
+		name: "Dopravci",
+		href: "/dopravci",
+		icon: CarTaxiFront,
+	},
+	{
+		name: "Emaily",
+		href: "/emaily",
+		icon: Mail,
+	},
+	{
+		name: "Základny",
+		href: "/zakladny",
+		icon: House,
+	},
+	{
+		name: "Staty",
+		href: "/staty",
+		icon: Globe,
+	},
+	{
+		name: "Otázky",
+		href: "/otazky",
+		icon: MessageCircleQuestionMark,
+	},
+	{
+		name: "Platební metody",
+		href: "/platebni-metody",
+		icon: CreditCard,
+	},
+	{
+		name: "Články",
+		href: "/clanky",
+		icon: FileUp,
+	},
+	{
+		name: "Stránky",
+		href: "/stranky",
+		icon: BookOpen,
+	},
+	{
+		name: "Služby",
+		href: "/sluzby",
+		icon: Bolt,
+	},
+	{
+		name: "Destinace",
+		href: "/destinace",
+		icon: MapPinned,
+	},
+	{
+		name: "Nastavení",
+		href: "/nastaveni",
+		icon: Settings,
+	},
+	{
+		name: "Chyby systému",
+		href: "/chyby",
+		icon: Bug,
+	},
+];
 </script>
 
 <nav id="sidebar" class:close={!open}>

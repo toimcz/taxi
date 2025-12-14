@@ -1,5 +1,5 @@
 <script>
-  import { PUBLIC_APP_LOGO_TEXT } from '$env/static/public';
+import { PUBLIC_APP_LOGO_TEXT } from "$env/static/public";
 </script>
 
 <div>

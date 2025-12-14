@@ -14,15 +14,18 @@
 	},
 	"dependencies": {
 		"@elysiajs/cors": "^1.3.3",
-		"@taxi/auth": "workspace:*",
+		"@taxi/cache": "workspace:*",
 		"@taxi/contracts": "workspace:*",
-		"@taxi/logger": "workspace:*",
 		"@taxi/db": "workspace:*",
-		"better-auth": "catalog:",
+		"@taxi/logger": "workspace:*",
+		"arctic": "^3.7.0",
+		"bullmq": "^5.66.0",
 		"dotenv": "catalog:",
 		"drizzle-orm": "catalog:",
 		"elysia": "catalog:",
-		"zod": "catalog:"
+		"meilisearch": "^0.54.0",
+		"valibot": "catalog:",
+		"@taxi/brevo": "workspace:*"
 	},
 	"devDependencies": {
 		"@taxi/config": "workspace:*",

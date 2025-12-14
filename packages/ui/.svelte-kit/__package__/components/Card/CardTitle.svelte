@@ -1,4 +1,5 @@
 <script lang="ts">
+import { cn } from "@taxi/utils";
 import type { Snippet } from "svelte";
 import type { SvelteHTMLElements } from "svelte/elements";
 
@@ -8,12 +9,10 @@ type Props = {
 	children: Snippet;
 };
 
-const {
-	tag,
-	class: className = "text-xl font-bold mb-5",
-	children,
-}: Props = $props();
+const { tag, class: className, children }: Props = $props();
 </script>
 
-<svelte:element this={tag} class={className}>{@render children?.()}</svelte:element>
+<svelte:element this={tag} class={cn('text-xl font-bold mb-5', className)}
+  >{@render children?.()}</svelte:element
+>
 <hr />

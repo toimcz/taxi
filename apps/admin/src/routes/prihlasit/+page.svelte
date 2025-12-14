@@ -10,8 +10,7 @@ import {
 	string,
 } from "valibot";
 import { goto } from "$app/navigation";
-import { PUBLIC_APP_URL } from "$env/static/public";
-import { $ERROR_CODES as ERROR_CODES, signIn } from "$lib/auth-client";
+import { PUBLIC_ADMIN_URL } from "$env/static/public";
 import { WebPage } from "$lib/components/WebPage";
 import { useToastStore } from "$lib/stores/index.js";
 
@@ -22,25 +21,6 @@ const SignInSchema = object({
 	email: pipe(string(), email()),
 	password: string(),
 });
-
-export const parseAuthError = (error: string | undefined, fallback: string) => {
-	if (!error) {
-		return fallback;
-	}
-	if (typeof error === "string") {
-		switch (error as keyof typeof ERROR_CODES) {
-			case "INVALID_EMAIL":
-				return "Zadaný email je neplatný.";
-			case "INVALID_EMAIL_OR_PASSWORD":
-				return "Zadaný email nebo heslo je neplatné.";
-			case "USER_ALREADY_EXISTS":
-				return "Uživatel s tímto emailem již existuje.";
-			default:
-				return fallback;
-		}
-	}
-	return fallback;
-};
 
 let login = $state({
 	email: "",
@@ -59,34 +39,28 @@ async function handleSignIn(e: Event) {
 		processing = false;
 		return;
 	}
-	const { error } = await signIn.email(login, {
-		onSuccess: () => {
-			toast.add("message", "Přihlášení bylo úspěšné.");
-			processing = false;
-			goto("/");
-		},
+	const response = await fetch("/api/auth/login-password", {
+		method: "POST",
+		body: JSON.stringify(login),
 	});
-	if (error) {
-		setErrorMessage(error.code);
+	if (!response.ok) {
+		const error = await response.json();
+		setErrorMessage(error.message);
 	}
+	toast.add("message", "Přihlášení bylo úspěšné.");
+	processing = false;
+	goto("/");
 }
 
 async function handleGoogleSignIn() {
 	processing = true;
-	const { error } = await signIn.social({
-		provider: "google",
-		callbackURL: PUBLIC_APP_URL,
-	});
-	if (error) {
-		setErrorMessage("Nepodařilo se přihlásit přes Google.");
-	} else {
-		processing = false;
-	}
+	// Use window.location for OAuth redirect (full page redirect, not fetch)
+	window.location.href = `/api/auth/google?redirectUrl=${encodeURIComponent(PUBLIC_ADMIN_URL)}`;
 }
 
 function setErrorMessage(message: string | undefined) {
 	processing = false;
-	errorMessage = parseAuthError(message, "Neplatné přihlášení.");
+	errorMessage = message ?? "Nepodařilo se přihlásit.";
 	toast.add("error", errorMessage);
 	setTimeout(() => {
 		errorMessage = "";

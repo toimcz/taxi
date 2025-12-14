@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { CircleCheck, CircleX } from '@lucide/svelte';
-  import { fly } from 'svelte/transition';
-  import { useToastStore } from '$lib/stores';
+import { CircleCheck, CircleX } from "@lucide/svelte";
+import { fly } from "svelte/transition";
+import { useToastStore } from "$lib/stores";
 
-  const toast = useToastStore();
+const toast = useToastStore();
 </script>
 
 {#if toast}

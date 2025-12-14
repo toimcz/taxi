@@ -1,16 +1,7 @@
-<script lang="ts">
-// Import 1
-import "@fontsource-variable/geologica";
-import "@fontsource/audiowide";
-// Import 2
-import "$lib/css/app.css";
-// Import 3
+<script>
 import { ProgressBar } from "@prgm/sveltekit-progress-bar";
 import { Sidebar } from "$lib/components/Sidebar";
-import Toast from "$lib/components/Toast/Toast.svelte";
-import { setToastStore } from "$lib/stores";
-
-setToastStore();
+import { Toast } from "$lib/components/Toast";
 
 let { children } = $props();
 </script>

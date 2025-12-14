@@ -1,18 +1,12 @@
-import { error } from "@sveltejs/kit";
-import { client } from "$lib/client";
+import { redirect } from "@sveltejs/kit";
+import { Role } from "@taxi/contracts/common";
 
-export const load = async () => {
-	const [topPages, bottomPages] = await Promise.all([
-		client.pages.top.get(),
-		client.pages.bottom.get(),
-	]);
-
-	if (topPages.error || bottomPages.error) {
-		throw error(500, "Failed to load pages");
+export const load = async ({ locals }) => {
+	if (!locals.user || locals.user.roles.includes(Role.USER)) {
+		redirect(302, "/prihlasit");
 	}
-
 	return {
-		topPages: topPages.data,
-		bottomPages: bottomPages.data,
+		session: locals.session,
+		user: locals.user,
 	};
 };

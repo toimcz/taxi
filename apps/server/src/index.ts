@@ -1,10 +1,10 @@
 import "dotenv/config";
 import { join } from "node:path";
 import { cors } from "@elysiajs/cors";
-import { auth } from "@taxi/auth";
 import { logger } from "@taxi/logger";
 import { Elysia } from "elysia";
 import { apiHandler } from "src/api/handler";
+import { config } from "src/common/config/config";
 
 // Get absolute path to cert directory (project root)
 const certPath = join(import.meta.dir, "../../../cert");
@@ -36,16 +36,24 @@ const app = new Elysia({
 })
 	.use(
 		cors({
-			origin: process.env.CORS_ORIGIN || "",
-			methods: ["GET", "POST", "OPTIONS"],
-			allowedHeaders: ["Content-Type", "Authorization"],
+			origin: ({ headers }) => {
+				const origin = headers.get("origin");
+				if (!origin) return true; // Allow same-origin requests
+				return config.TRUSTED_ORIGINS.includes(origin);
+			},
+			methods: ["GET", "POST", "OPTIONS", "PUT", "DELETE", "PATCH"],
+			allowedHeaders: [
+				"Content-Type",
+				"Authorization",
+				"X-Requested-With",
+				"Accept",
+			],
 			credentials: true,
 		}),
 	)
-	.mount(auth.handler)
 	.use(apiHandler)
 	.get("/", () => "OK")
-	.listen(4000, ({ hostname, port }) => {
+	.listen(config.PORT, ({ hostname, port }) => {
 		logger.info(`Server is running on https://${hostname}:${port}`);
 	});
 

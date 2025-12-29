@@ -18,7 +18,7 @@ export const LoginPasswordInput = object({
 });
 
 export const LoginPasswordDTO = object({
-	email: pipe(string(), email("Neplatný email")),
+	email: emailSchema("Neplatný email"),
 	password: pipe(string(), minLength(8, "Heslo musí obsahovat alespoň 8 znaků")),
 });
 
@@ -30,7 +30,7 @@ export const LoginEmailInput = object({
 });
 
 export const LoginEmailDTO = object({
-	email: pipe(string(), email("Neplatný email")),
+	email: emailSchema("Neplatný email"),
 	redirectUrl: pipe(string(), url("Neplatná URL")),
 });
 

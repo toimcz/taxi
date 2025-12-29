@@ -30,15 +30,7 @@ onMount(async () => {
 				toolbar: {
 					container: [
 						[{ header: 2 }, { header: 3 }, { header: 4 }],
-						[
-							"bold",
-							"italic",
-							"underline",
-							"strike",
-							"link",
-							"size",
-							"blockquote",
-						],
+						["bold", "italic", "underline", "strike", "link", "size", "blockquote"],
 						[{ list: "ordered" }, { list: "bullet" }, { list: "" }],
 						["clean"],
 					],

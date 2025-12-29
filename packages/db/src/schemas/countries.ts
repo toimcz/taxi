@@ -66,7 +66,7 @@ export const countries$ = pgTable(
 		name: varchar("name", { length: 100 }).notNull(),
 
 		/** Country unaccented name (2-100 characters, must be unique and non-empty) */
-		uname: varchar("uname", { length: 100 }).notNull(),
+		uname: varchar("uname", { length: 100 }).notNull().unique(),
 
 		/** Pricing coefficient for rides (1-10000, default: 100, represents percentage multiplier) */
 		koeficient: koeficient("koeficient").notNull().default(100),
@@ -89,31 +89,15 @@ export const countries$ = pgTable(
 		index("countries_uname_idx").on(countries.uname),
 		index("countries_status_idx").on(countries.status),
 		index("countries_koeficient_idx").on(countries.koeficient),
-		index("countries_active_routes_idx").on(
-			countries.status,
-			countries.from,
-			countries.to,
-		),
+		index("countries_active_routes_idx").on(countries.status, countries.from, countries.to),
 
 		// Data validation constraints
 		check("countries_name_length_check", sql`length(${countries.name}) >= 2`),
-		check(
-			"countries_name_not_empty_check",
-			sql`length(trim(${countries.name})) >= 1`,
-		),
+		check("countries_name_not_empty_check", sql`length(trim(${countries.name})) >= 1`),
 		check("countries_uname_length_check", sql`length(${countries.uname}) >= 2`),
-		check(
-			"countries_uname_not_empty_check",
-			sql`length(trim(${countries.uname})) >= 1`,
-		),
-		check(
-			"countries_koeficient_positive_check",
-			sql`${countries.koeficient} >= 1`,
-		),
-		check(
-			"countries_koeficient_reasonable_check",
-			sql`${countries.koeficient} <= 10000`,
-		),
+		check("countries_uname_not_empty_check", sql`length(trim(${countries.uname})) >= 1`),
+		check("countries_koeficient_positive_check", sql`${countries.koeficient} >= 1`),
+		check("countries_koeficient_reasonable_check", sql`${countries.koeficient} <= 10000`),
 		check(
 			"countries_route_logic_check",
 			sql`${countries.status} = false OR (${countries.from} = true OR ${countries.to} = true OR ${countries.in} = true)`,

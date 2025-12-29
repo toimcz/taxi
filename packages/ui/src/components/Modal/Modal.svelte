@@ -10,12 +10,7 @@ type Props = {
 	children: Snippet;
 };
 
-let {
-	children,
-	show = $bindable(false),
-	class: className = "",
-	onClose,
-}: Props = $props();
+let { children, show = $bindable(false), class: className = "", onClose }: Props = $props();
 
 function close() {
 	show = false;

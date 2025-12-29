@@ -1,0 +1,21 @@
+<script lang="ts">
+import { Navbar } from "$lib/components";
+
+let { children } = $props();
+
+const links = [
+	{
+		name: "Státy",
+		href: "/staty",
+	},
+	{
+		name: "Vytvořit stát",
+		href: "/staty/novy",
+	},
+];
+</script>
+
+<div class="flex flex-col gap-4">
+	<Navbar {links} />
+	{@render children?.()}
+</div>

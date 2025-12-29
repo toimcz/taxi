@@ -130,12 +130,7 @@ export const text = {
 function hoursText(hours: number, short = false): string {
 	if (short) return "hod";
 	if (hours === 1) return "hodina";
-	if (
-		hours % 10 >= 2 &&
-		hours % 10 <= 4 &&
-		(hours % 100 < 12 || hours % 100 > 14)
-	)
-		return "hodiny";
+	if (hours % 10 >= 2 && hours % 10 <= 4 && (hours % 100 < 12 || hours % 100 > 14)) return "hodiny";
 	return "hodin";
 }
 
@@ -150,11 +145,7 @@ function hoursText(hours: number, short = false): string {
 function minutesText(minutes: number, short = false): string {
 	if (short) return "min";
 	if (minutes === 1) return "minuta";
-	if (
-		minutes % 10 >= 2 &&
-		minutes % 10 <= 4 &&
-		(minutes % 100 < 12 || minutes % 100 > 14)
-	)
+	if (minutes % 10 >= 2 && minutes % 10 <= 4 && (minutes % 100 < 12 || minutes % 100 > 14))
 		return "minuty";
 	return "minut";
 }
@@ -170,11 +161,7 @@ function minutesText(minutes: number, short = false): string {
 function secondsText(seconds: number, short = false): string {
 	if (short) return "s";
 	if (seconds === 1) return "sekunda";
-	if (
-		seconds % 10 >= 2 &&
-		seconds % 10 <= 4 &&
-		(seconds % 100 < 12 || seconds % 100 > 14)
-	)
+	if (seconds % 10 >= 2 && seconds % 10 <= 4 && (seconds % 100 < 12 || seconds % 100 > 14))
 		return "sekundy";
 	return "sekund";
 }

@@ -1,14 +1,6 @@
 <script lang="ts">
 import { cn } from "@taxi/utils";
-import {
-	format,
-	isAfter,
-	isSameDay,
-	isSunday,
-	isToday,
-	startOfDay,
-	subDays,
-} from "date-fns";
+import { format, isAfter, isSameDay, isSunday, isToday, startOfDay, subDays } from "date-fns";
 
 type Props = {
 	day: Date;

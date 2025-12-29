@@ -1,36 +1,34 @@
 {
 	"name": "@taxi/server",
+	"version": "0.0.1",
 	"main": "src/index.ts",
 	"exports": {
 		".": "./src/index.ts"
 	},
-	"type": "module",
-	"scripts": {
-		"build": "tsdown",
-		"check-types": "tsc -b",
-		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
-		"dev": "NODE_ENV=development bun run --hot src/index.ts",
-		"start": "NODE_ENV=production bun run dist/index.js"
-	},
-	"dependencies": {
-		"@elysiajs/cors": "^1.3.3",
-		"@taxi/cache": "workspace:*",
-		"@taxi/contracts": "workspace:*",
-		"@taxi/db": "workspace:*",
-		"@taxi/logger": "workspace:*",
-		"arctic": "^3.7.0",
-		"bullmq": "^5.66.0",
-		"dotenv": "catalog:",
-		"drizzle-orm": "catalog:",
-		"elysia": "catalog:",
-		"meilisearch": "^0.54.0",
-		"valibot": "catalog:",
-		"@taxi/brevo": "workspace:*"
-	},
+	"module": "src/index.ts",
 	"devDependencies": {
 		"@taxi/config": "workspace:*",
-		"@types/bun": "^1.3.4",
-		"tsdown": "^0.16.5",
-		"typescript": "^5.8.2"
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"private": true,
+	"scripts": {
+		"dev": "NODE_ENV=development bun --watch run src/index.ts",
+		"compile": "rm -rf .bun-tmp && mkdir .bun-tmp && cd .bun-tmp && bun build --compile --minify --bytecode ../src/index.ts --outfile ../bin/server && cd .. && rm -rf .bun-tmp",
+		"start": "NODE_ENV=production ./bin/server"
+	},
+	"type": "module",
+	"dependencies": {
+		"@orpc/client": "catalog:",
+		"@orpc/openapi": "catalog:",
+		"@orpc/server": "catalog:",
+		"@orpc/valibot": "catalog:",
+		"@taxi/api": "workspace:*",
+		"@taxi/contracts": "workspace:*",
+		"pino": "^10.1.0",
+		"pino-pretty": "^13.1.3",
+		"valibot": "catalog:"
 	}
 }

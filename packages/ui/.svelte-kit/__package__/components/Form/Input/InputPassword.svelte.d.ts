@@ -7,7 +7,11 @@ type Props = {
     name: string;
     autocomplete?: FullAutoFill | null | undefined;
     error?: string[] | undefined;
-    setValue?: (v: string) => void;
+    required?: boolean;
+    disabled?: boolean;
+    helperText?: string;
+    minlength?: number;
+    maxlength?: number;
 };
 declare const InputPassword: import("svelte").Component<Props, {}, "value">;
 type InputPassword = ReturnType<typeof InputPassword>;

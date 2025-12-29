@@ -1,0 +1,522 @@
+---
+description: Comprehensive Elysia.js best practices for type-safe, performant APIs with Valibot validation, proper error handling, and clean architecture
+alwaysApply: true
+glob: "**/*.ts,**/*.tsx"
+---
+
+# 🛡️ Valibot Validation (Priority 1: Type Safety)
+
+1. **Validate All Inputs:** Always use Valibot schemas to validate all external route inputs: `body`, `query`, `params`, `headers`, and `cookie`. **FORBIDDEN:** Never rely on implicit typing from runtime data or trust unvalidated input.
+
+2. **External Schemas in Contracts Package:** Define all Valibot schemas in the `packages/contracts` directory, organized by domain (e.g., `auth/auth.input.ts`, `users/users.input.ts`). **FORBIDDEN:** Never define schemas inline in handler files.
+
+3. **Valibot Import Alias:** When importing Valibot in schema files, you may use named imports for specific functions. For utility/reusable schema files, use `import * as v from 'valibot'` for consistency.
+
+4. **Type Inference with InferInput/InferOutput:** Always use `InferInput<T>` for handler parameters and `InferOutput<T>` for response types. Export both the schema and the inferred type:
+   ```typescript
+   // ✅ CORRECT
+   export const LoginPasswordInput = object({
+     email: emailSchema("Email je neplatný"),
+     password: pipe(string(), minLength(8, "Heslo musí obsahovat alespoň 8 znaků")),
+   });
+   export type LoginPasswordInput = InferInput<typeof LoginPasswordInput>;
+
+   // ❌ FORBIDDEN - Manual interface
+   interface LoginPasswordInput {
+     email: string;
+     password: string;
+   }
+   ```
+
+5. **Complex Validation with pipe():** Always use `pipe()` for chaining validations and transformations. This ensures proper type inference and composability:
+   ```typescript
+   // ✅ CORRECT
+   email: pipe(string(), email(), trim(), toLowerCase())
+
+   // ❌ AVOID - Multiple separate validators
+   email: string().email().trim().toLowerCase()
+   ```
+
+6. **Reusable Schema Helpers:** Create reusable schema builders in `common-schemas.ts` for frequently used patterns:
+   ```typescript
+   export const emailSchema = (message?: string) =>
+     pipe(string(), email(message || "Invalid email"), trim(), toLowerCase());
+
+   export const uuidSchema = (message?: string) =>
+     pipe(string(), uuid(message));
+   ```
+
+7. **Cross-Field Validation:** Use `partialCheck()` with `forward()` for validations that depend on multiple fields:
+   ```typescript
+   export const RegisterPasswordInput = pipe(
+     object({
+       password: pipe(string(), minLength(8)),
+       passwordConfirm: pipe(string(), minLength(8)),
+     }),
+     forward(
+       partialCheck(
+         [["password"], ["passwordConfirm"]],
+         ({ password, passwordConfirm }) => password === passwordConfirm,
+         "Passwords must match"
+       ),
+       ["passwordConfirm"] // Error appears on passwordConfirm field
+     )
+   );
+   ```
+
+8. **Async Validation (Use Sparingly):** Prefer synchronous schemas for maximum performance. Use async schemas (`objectAsync`, `pipeAsync`) ONLY when essential for external checks like database lookups. For most cases, perform database checks in the handler/service layer.
+
+9. **Response Validation:** Always define response schemas for all status codes to ensure type-safe, predictable outputs:
+   ```typescript
+   .post("/login", handler, {
+     body: LoginPasswordInput,
+     response: {
+       200: SuccessResponse,
+       401: UnauthorizedResponse,
+       500: InternalServerErrorResponse,
+     },
+   })
+   ```
+
+10. **Optional Fields with Defaults:** Use `optional()` with default values for fields that have fallbacks:
+    ```typescript
+    page: optional(string(), "1"),
+    limit: optional(number(), 10),
+    ```
+
+# 💻 Handler and Service Architecture
+
+11. **File Naming Conventions:**
+    - Handlers: `*.handler.ts` (e.g., `auth.handler.ts`, `users-admin.handler.ts`)
+    - Services: `*.service.ts` (e.g., `auth.service.ts`, `users.service.ts`)
+    - Middleware: `*.middleware.ts` (e.g., `sessions.middleware.ts`)
+    - Schemas: `*.input.ts` for inputs, `*.output.ts` for outputs
+
+12. **Handler Structure:** Each handler must be an Elysia instance with a `prefix` and `name` for debugging and plugin composition:
+    ```typescript
+    export const authHandler = new Elysia({
+      prefix: "/auth",
+      name: "auth",
+    })
+      .decorate("authService", AuthService.instance)
+      .post("/login", handler, { body, response });
+    ```
+
+13. **Separation of Concerns - Handler Responsibilities:**
+    - Route definition and HTTP concerns (status codes, cookies, headers)
+    - Input validation (via Valibot schemas)
+    - Service method calls
+    - Response formatting
+    - Error handling and status code mapping
+
+    **FORBIDDEN:** Never put business logic, database queries, or external API calls directly in handlers.
+
+14. **Separation of Concerns - Service Responsibilities:**
+    - Business logic implementation
+    - Database operations
+    - External API calls
+    - Data transformations
+    - Complex computations
+
+    Services should receive typed inputs (from Valibot inference) and return typed outputs.
+
+15. **Singleton Pattern for Services:** Always use the singleton pattern with TypeScript private constructor for services:
+    ```typescript
+    export class AuthService {
+      static #instance: AuthService;
+
+      private constructor(
+        private readonly dependency1: Dependency1,
+        private readonly dependency2: Dependency2,
+      ) {}
+
+      static get instance(): AuthService {
+        if (!AuthService.#instance) {
+          AuthService.#instance = new AuthService(
+            Dependency1.instance,
+            Dependency2.instance,
+          );
+        }
+        return AuthService.#instance;
+      }
+
+      async method(input: Input): Promise<Output> {
+        // Implementation
+      }
+    }
+    ```
+
+16. **Service Dependency Injection via .decorate():** Use `.decorate()` to inject singleton services into the Elysia context, making them available with type inference:
+    ```typescript
+    export const authHandler = new Elysia({ prefix: "/auth" })
+      .decorate("authService", AuthService.instance)
+      .decorate("sessionsService", SessionsService.instance)
+      .post("/login", async ({ body, authService }) => {
+        return await authService.login(body);
+      });
+    ```
+
+17. **Interfaces for Services:** Define interfaces for service contracts to improve testability and maintainability:
+    ```typescript
+    interface IAuthService {
+      login(input: LoginInput): Promise<Session>;
+      logout(sessionId: string): Promise<void>;
+    }
+
+    export class AuthService implements IAuthService {
+      // Implementation
+    }
+    ```
+
+# 🚀 Elysia Features and Performance
+
+18. **Plugin Composition:** Each logical domain must be implemented as a separate Elysia plugin with its own prefix and name:
+    ```typescript
+    // api/handler.ts
+    const webHandler = new Elysia({ prefix: "/web", name: "web" })
+      .use(pagesWebHandler)
+      .use(postsWebHandler)
+      .use(servicesWebHandler);
+
+    const adminHandler = new Elysia({ prefix: "/admin", name: "admin" })
+      .use(usersAdminHandler);
+
+    export const apiHandler = new Elysia({ prefix: "/api", name: "api" })
+      .use(authHandler)
+      .use(webHandler)
+      .use(adminHandler);
+    ```
+
+19. **Middleware with .resolve():** Use `.resolve()` for middleware that enriches the context. Use `as: "global"` to make it available to all subsequent handlers:
+    ```typescript
+    export const sessionsMiddleware = new Elysia({ name: "sessions-middleware" })
+      .resolve({ as: "global" }, async ({ cookie }) => {
+        const sessionId = cookie.sessionCookie?.value;
+        if (!sessionId) return { session: null, user: null };
+
+        const session = await SessionsService.instance.getSession(sessionId);
+        return { session, user: session?.user ?? null };
+      });
+    ```
+
+20. **Guard for Pre-validation (Future):** For routes requiring authentication, consider creating a guard middleware:
+    ```typescript
+    const authGuard = new Elysia({ name: "auth-guard" })
+      .derive(({ session, status }) => {
+        if (!session) {
+          throw status(401, { status: 401, message: "Unauthorized" });
+        }
+        return { session };
+      });
+
+    // Usage
+    export const protectedHandler = new Elysia()
+      .use(sessionsMiddleware)
+      .use(authGuard)
+      .get("/protected", ({ session }) => {
+        // session is guaranteed to exist here
+      });
+    ```
+
+21. **Error Handling - Custom Errors:** Define custom error classes in `common/errors.ts` with status codes:
+    ```typescript
+    export class ConflictError extends Error {
+      status: number;
+      constructor(message = "Conflict") {
+        super(message);
+        this.name = "ConflictError";
+        this.status = 409;
+        if (Error.captureStackTrace) {
+          Error.captureStackTrace(this, ConflictError);
+        }
+      }
+    }
+    ```
+
+22. **Error Handling - Handler Level:** Catch service errors and map them to appropriate HTTP status codes:
+    ```typescript
+    .post("/register", async ({ body, status, authService }) => {
+      try {
+        const result = await authService.register(body);
+        return { success: true, data: result };
+      } catch (error) {
+        if (error instanceof ConflictError) {
+          throw status(409, { status: 409, message: error.message });
+        }
+        logger.error(error instanceof Error ? error.message : String(error));
+        throw status(500, { status: 500, message: "Internal server error" });
+      }
+    }, {
+      body: RegisterInput,
+      response: {
+        200: SuccessResponse,
+        409: ConflictResponse,
+        500: InternalServerErrorResponse,
+      },
+    })
+    ```
+
+23. **Error Handling - Never Leak Sensitive Info:** Always use generic error messages for clients and log detailed errors server-side:
+    ```typescript
+    // ✅ CORRECT
+    catch (error) {
+      logger.error(`Detailed error: ${error}`); // Server logs
+      throw status(401, {
+        status: 401,
+        message: "Invalid credentials" // Generic client message
+      });
+    }
+
+    // ❌ FORBIDDEN
+    catch (error) {
+      throw status(500, { message: error.message }); // Leaks stack trace
+    }
+    ```
+
+24. **Standard Error Handling:** Elysia automatically returns **422 Unprocessable Entity** for Valibot validation failures. **FORBIDDEN:** Do not manually catch or handle schema validation errors unless you need custom error formatting.
+
+25. **Cookie Management:** Use Elysia's cookie API with proper security attributes:
+    ```typescript
+    // Set cookie
+    const authCookie = cookie[config.AUTH_COOKIE];
+    if (authCookie) {
+      authCookie.set({
+        value: sessionId,
+        httpOnly: true,
+        secure: true, // HTTPS only (disable in dev)
+        sameSite: "lax",
+        path: "/",
+        maxAge: 2592000, // 30 days in seconds
+      });
+    }
+
+    // Delete cookie
+    authCookie.set({
+      value: "",
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 0,
+      expires: new Date(0),
+    });
+    ```
+
+26. **CORS Configuration:** Configure CORS properly in the main app with trusted origins:
+    ```typescript
+    import { cors } from "@elysiajs/cors";
+
+    const app = new Elysia()
+      .use(cors({
+        origin: ({ headers }) => {
+          const origin = headers.get("origin");
+          if (!origin) return true; // Same-origin requests
+          return config.TRUSTED_ORIGINS.includes(origin);
+        },
+        methods: ["GET", "POST", "OPTIONS", "PUT", "DELETE", "PATCH"],
+        credentials: true,
+      }))
+      .use(apiHandler)
+      .listen(config.PORT);
+    ```
+
+# ⚡ Performance and Optimization
+
+27. **Prepared Statements for Hot Paths:** For frequently executed queries, use Drizzle's prepared statements in `*.prepare.ts` files:
+    ```typescript
+    // users.prepare.ts
+    export const findUserById = db
+      .select()
+      .from(users$)
+      .where(eq(users$.id, sql.placeholder("id")))
+      .prepare("findUserById");
+
+    // Usage in service
+    const [user] = await findUserById.execute({ id: userId });
+    ```
+
+28. **Lazy Loading of Services:** Services use the singleton pattern, which provides lazy initialization. The service instance is created only when first accessed.
+
+29. **Streaming Responses (When Needed):** For large datasets, consider streaming responses instead of loading everything into memory:
+    ```typescript
+    .get("/large-dataset", async () => {
+      return new Response(stream, {
+        headers: { "Content-Type": "application/json" },
+      });
+    })
+    ```
+
+30. **Type Export for Eden Treaty:** Export the Elysia app type for type-safe API clients:
+    ```typescript
+    // index.ts
+    const app = new Elysia()
+      .use(apiHandler)
+      .listen(config.PORT);
+
+    export type App = typeof app;
+
+    // Client usage
+    import type { App } from "@taxi/server";
+    import { treaty } from "@elysiajs/eden";
+
+    const api = treaty<App>("https://api.example.com");
+    ```
+
+# 📝 Code Quality and Best Practices
+
+31. **Route Documentation with JSDoc:** Add JSDoc comments to complex routes explaining their purpose:
+    ```typescript
+    /**
+     * Validates a magic link token and creates a new session.
+     * The token is single-use and expires after 30 minutes.
+     */
+    .post("/magiclink", handler, options)
+    ```
+
+32. **Consistent Naming:** Use descriptive, consistent names:
+    - Handlers: `{domain}Handler` (e.g., `authHandler`, `usersAdminHandler`)
+    - Services: `{Domain}Service` (e.g., `AuthService`, `UsersService`)
+    - Middleware: `{purpose}Middleware` (e.g., `sessionsMiddleware`)
+    - Input schemas: `{Action}{Resource}Input` (e.g., `LoginPasswordInput`)
+    - Output schemas: `{Resource}` or `{Resource}Item` (e.g., `User`, `UserItem`)
+
+33. **HTTP Status Codes:** Use appropriate status codes consistently:
+    - 200 OK - Successful GET, PUT, PATCH
+    - 201 Created - Successful POST creating a resource
+    - 204 No Content - Successful DELETE
+    - 400 Bad Request - Client error (malformed request)
+    - 401 Unauthorized - Authentication required or failed
+    - 403 Forbidden - Authenticated but not authorized
+    - 404 Not Found - Resource doesn't exist
+    - 409 Conflict - Duplicate resource or business logic conflict
+    - 422 Unprocessable Entity - Validation error (automatic from Valibot)
+    - 500 Internal Server Error - Server error
+
+34. **Logging:** Log important events and errors using the logger:
+    ```typescript
+    import { logger } from "@taxi/logger";
+
+    // Success events
+    logger.info(`User ${userId} logged in successfully`);
+
+    // Errors (without sensitive data)
+    logger.error(`Failed to create user: ${error.message}`);
+
+    // ❌ FORBIDDEN - Don't log sensitive data
+    logger.error(`Password hash: ${passwordHash}`); // NEVER
+    ```
+
+35. **Environment Configuration:** Centralize configuration in `config.ts` with Valibot validation:
+    ```typescript
+    import { parse, object, string, pipe, transform } from "valibot";
+
+    const configSchema = object({
+      PORT: pipe(string(), transform(Number)),
+      DATABASE_URL: string(),
+      AUTH_SECRET: string(),
+      // ... more config
+    });
+
+    export const config = parse(configSchema, process.env);
+    ```
+
+36. **Transaction Handling:** For operations that must be atomic, use database transactions in services:
+    ```typescript
+    async registerUser(input: RegisterInput): Promise<User> {
+      return await db.transaction(async (tx) => {
+        const user = await tx.insert(users$).values({ ... }).returning();
+        await tx.insert(identities$).values({ userId: user.id, ... });
+        return user;
+      });
+    }
+    ```
+
+37. **Input Sanitization:** Always sanitize and normalize inputs in schemas:
+    ```typescript
+    // Email normalization
+    email: pipe(string(), email(), trim(), toLowerCase())
+
+    // Name trimming
+    name: pipe(string(), minLength(1), trim())
+    ```
+
+38. **Rate Limiting (Critical):** Implement rate limiting for public endpoints to prevent abuse. Consider using Redis-backed rate limiting middleware for authentication endpoints.
+
+39. **Health Check Endpoint:** Always include a health check endpoint:
+    ```typescript
+    const app = new Elysia()
+      .use(apiHandler)
+      .get("/", () => "OK")
+      .get("/health", () => ({ status: "healthy", timestamp: Date.now() }));
+    ```
+
+40. **Avoid any Types:** Never use `any` types. Use `unknown` for truly unknown types and narrow with type guards:
+    ```typescript
+    // ✅ CORRECT
+    catch (error) {
+      if (error instanceof Error) {
+        logger.error(error.message);
+      } else {
+        logger.error(String(error));
+      }
+    }
+
+    // ❌ FORBIDDEN
+    catch (error: any) {
+      logger.error(error.message);
+    }
+    ```
+
+# 🔐 Security Best Practices
+
+41. **Never Trust Client Input:** Always validate all inputs with Valibot schemas, even for authenticated routes.
+
+42. **Secure Cookie Attributes:** Always use `httpOnly`, `secure` (in production), and `sameSite` for session cookies.
+
+43. **CORS Whitelist:** Never use `origin: "*"` in production. Always validate against `TRUSTED_ORIGINS`.
+
+44. **SQL Injection Prevention:** Use Drizzle ORM's parameterized queries. Never concatenate user input into raw SQL.
+
+45. **Authentication State:** Use middleware to load session/user state globally rather than checking in each handler.
+
+46. **Password Hashing:** Always use `Bun.password.hash()` for passwords (Argon2id) and `Bun.password.verify()` for verification. Never use generic hashing algorithms.
+
+47. **Error Messages:** Use generic error messages to avoid information disclosure (e.g., don't reveal if an email exists during login failures).
+
+48. **HTTPS in Production:** Always run production servers over HTTPS with valid certificates.
+
+49. **Secret Management:** Store all secrets in environment variables, validate them at startup, and never commit them to version control.
+
+50. **Audit Logging:** Log all authentication events, failed login attempts, and sensitive operations for security monitoring.
+
+---
+
+## ✅ Quick Reference Checklist
+
+Before committing a new Elysia handler:
+
+- [ ] All inputs validated with Valibot schemas from contracts package
+- [ ] Response schemas defined for all status codes
+- [ ] Business logic isolated in service layer
+- [ ] Service uses singleton pattern with private constructor
+- [ ] Service decorated into handler context with `.decorate()`
+- [ ] Error handling catches service errors and maps to HTTP status codes
+- [ ] Generic error messages for clients, detailed logs on server
+- [ ] Handler has `prefix` and `name` in constructor
+- [ ] Handler follows naming convention (`*.handler.ts`)
+- [ ] Cookies use secure attributes (httpOnly, secure, sameSite)
+- [ ] Type inference uses `InferInput` / `InferOutput`
+- [ ] No business logic in handlers (only in services)
+- [ ] No `any` types
+- [ ] Sensitive data never logged or exposed in errors
+- [ ] App type exported for Eden Treaty client
+
+---
+
+## 📚 References
+
+- [Elysia Documentation](https://elysiajs.com/)
+- [Valibot Documentation](https://valibot.dev/)
+- [Eden Treaty Documentation](https://elysiajs.com/eden/overview.html)
+- [Bun Runtime](https://bun.sh/)
+- [Drizzle ORM](https://orm.drizzle.team/)

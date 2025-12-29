@@ -1,23 +1,24 @@
 <script lang="ts">
+import { useLoginEmail } from "@taxi/client-auth";
 import { InputEmail } from "@taxi/ui";
-import { goto } from "$app/navigation";
+import { goto, invalidateAll } from "$app/navigation";
 import { PUBLIC_APP_URL } from "$env/static/public";
 import { SubmitButton } from "$lib/components/Button";
-import { useLoginEmail } from "$lib/hooks/use-auth.svelte";
+import { useToastStore } from "$lib/stores";
+
+const toast = useToastStore();
 
 // DO NOT USE DESTRUCTURING HERE, IT WILL BREAK THE FORM
 const form = useLoginEmail({
-	onSuccess: async (toast) => {
-		toast.add("message", "Přihlášení bylo úspěšné.");
+	onSuccess: async () => {
+		await invalidateAll();
+		toast.add("message", "Odkaz pro přihlášení byl odeslán na váš email.");
 		goto("/");
 	},
-	onError: (toast) => {
-		toast.add("error", "Nepodařilo se přihlásit.");
+	onError: (message: string) => {
+		toast.add("error", message);
 	},
 });
-
-$inspect(form.issues);
-$inspect(form.processing);
 </script>
 
 <div>

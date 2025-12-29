@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { Role } from "@taxi/contracts/common";
+import type { Role } from "@taxi/contracts";
 import { page } from "$app/state";
 
 type Props = {
@@ -16,7 +16,7 @@ let { links }: Props = $props();
 <nav class="bg-one flex items-center gap-x-3 rounded-2xl px-6 py-3">
   {#each links as { name, href, role }, i (i)}
     {#if !role || role.some((r) => page.data.auth?.role?.includes(r))}
-      <a {href} class="btn btn-link" class:btn-link-active={href === page.url.pathname}>{name}</a>
+      <a {href} class="btn btn-light" class:btn-link-active={href === page.url.pathname}>{name}</a>
     {/if}
   {/each}
 </nav>

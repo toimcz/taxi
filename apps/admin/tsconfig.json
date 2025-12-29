@@ -14,7 +14,10 @@
 	},
 	"references": [
 		{
-			"path": "../../apps/server"
+			"path": "../../packages/api"
+		},
+		{
+			"path": "../../packages/contracts"
 		}
 	]
 }

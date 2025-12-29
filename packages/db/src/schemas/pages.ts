@@ -30,14 +30,7 @@
  */
 
 import { sql } from "drizzle-orm";
-import {
-	boolean,
-	index,
-	integer,
-	pgTable,
-	text,
-	varchar,
-} from "drizzle-orm/pg-core";
+import { boolean, index, integer, pgTable, text, varchar } from "drizzle-orm/pg-core";
 import { defaultColumns, primaryUUID } from "./_custom-types";
 
 /**
@@ -96,10 +89,7 @@ export const pages$ = pgTable(
 		index("pages_title_idx").on(pages.title),
 		index("pages_created_at_idx").on(pages.createdAt),
 		index("pages_slug_title_idx").on(pages.slug, pages.title),
-		index("pages_content_search_idx").using(
-			"gin",
-			sql`to_tsvector('english', ${pages.content})`,
-		),
+		index("pages_content_search_idx").using("gin", sql`to_tsvector('english', ${pages.content})`),
 	],
 );
 

@@ -1,10 +1,13 @@
 export { default as Input } from "./Input.svelte";
 export { default as InputDate } from "./InputDate.svelte";
+export { default as InputEditor } from "./InputEditor.svelte";
 export { default as InputEmail } from "./InputEmail.svelte";
 export { default as InputMoney } from "./InputMoney.svelte";
+export { default as InputMultiSelect } from "./InputMultiSelect.svelte";
 export { default as InputNumber } from "./InputNumber.svelte";
 export { default as InputPassword } from "./InputPassword.svelte";
 export { default as InputPhone } from "./InputPhone.svelte";
+export { default as InputPhoto } from "./InputPhoto.svelte";
 export { default as InputPlace } from "./InputPlace.svelte";
 export { default as InputSwitch } from "./InputSwitch.svelte";
 export { default as InputText } from "./InputText.svelte";

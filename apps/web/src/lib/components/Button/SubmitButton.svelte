@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Spinner } from "@taxi/ui";
+import { cn } from "@taxi/utils";
 import type { Snippet } from "svelte";
-import { cn } from "$lib/utils";
 
 type Props = {
 	class?: string;

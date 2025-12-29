@@ -39,5 +39,4 @@ const SEARCH_KEY = Symbol("toasts");
 
 export const setToastStore = () => setContext(SEARCH_KEY, new ToastStore());
 
-export const useToastStore = () =>
-	getContext<ReturnType<typeof setToastStore>>(SEARCH_KEY);
+export const useToastStore = () => getContext<ReturnType<typeof setToastStore>>(SEARCH_KEY);

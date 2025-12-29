@@ -1,21 +1,9 @@
-import { type BillingDetail, IdentityType, Role } from "@taxi/contracts/common";
+import { type BillingDetail, IdentityType, Role } from "@taxi/contracts";
 import { relations } from "drizzle-orm";
-import {
-	boolean,
-	index,
-	jsonb,
-	pgEnum,
-	pgTable,
-	text,
-	timestamp,
-	uuid,
-} from "drizzle-orm/pg-core";
+import { boolean, index, jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { defaultColumns, primaryUUID } from "./_custom-types";
 
-export const roles = pgEnum(
-	"roles",
-	Object.values(Role) as [string, ...string[]],
-);
+export const roles = pgEnum("roles", Object.values(Role) as [string, ...string[]]);
 export const identityTypes = pgEnum(
 	"identity_types",
 	Object.values(IdentityType) as [string, ...string[]],
@@ -32,11 +20,7 @@ export const users$ = pgTable(
 		emailVerified: boolean("email_verified").default(false).notNull(),
 		image: text("image"),
 		phone: text("phone"),
-		roles: roles("roles")
-			.array()
-			.$type<Role[]>()
-			.default([Role.USER])
-			.notNull(),
+		roles: roles("roles").array().$type<Role[]>().default([Role.USER]).notNull(),
 		note: text("note").default("").notNull(),
 		billingDetails: jsonb("billing_details").$type<BillingDetail>().notNull(),
 		...defaultColumns,

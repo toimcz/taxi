@@ -16,6 +16,7 @@ const DECIMAL_PLACES = 2;
 
 export const primaryUUID = (name: string) =>
 	uuid(name).primaryKey().default(sql`uuid_generate_v7()`);
+
 export const defaultColumns = {
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updated_at")

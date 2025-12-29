@@ -1,8 +1,6 @@
 export const clickOutside = (node) => {
     const handleClick = (event) => {
-        if (node &&
-            !node.contains(event.target) &&
-            !event.defaultPrevented) {
+        if (node && !node.contains(event.target) && !event.defaultPrevented) {
             node.dispatchEvent(new CustomEvent("clickoutside", node));
         }
     };

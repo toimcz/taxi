@@ -1,0 +1,1 @@
+ALTER TABLE "countries" ADD CONSTRAINT "countries_uname_unique" UNIQUE("uname");

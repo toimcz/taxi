@@ -1,5 +1,5 @@
 import { json } from "@sveltejs/kit";
-import { RegisterPasswordInput } from "@taxi/contracts/auth/auth.input";
+import { RegisterPasswordInput } from "@taxi/contracts";
 import { safeParse } from "valibot";
 import { auth } from "$lib/server/api.js";
 
@@ -19,15 +19,9 @@ export const POST = async ({ request }) => {
 	const { data, error } = await auth().register.password.post(validated.output);
 	if (error) {
 		if (error.status === 409) {
-			return json(
-				{ success: false, message: "Uživatel již existuje" },
-				{ status: 409 },
-			);
+			return json({ success: false, message: "Uživatel již existuje" }, { status: 409 });
 		}
-		return json(
-			{ success: false, message: "Chyba při registraci" },
-			{ status: 500 },
-		);
+		return json({ success: false, message: "Chyba při registraci" }, { status: 500 });
 	}
 	return json({ success: true, message: data.message });
 };

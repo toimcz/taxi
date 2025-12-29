@@ -26,7 +26,6 @@
  * ```
  */
 declare module '$env/static/private' {
-	export const VSCODE_GIT_IPC_AUTH_TOKEN: string;
 	export const TERM_PROGRAM: string;
 	export const NODE: string;
 	export const TERM: string;
@@ -34,7 +33,6 @@ declare module '$env/static/private' {
 	export const TURBO_IS_TUI: string;
 	export const npm_config_local_prefix: string;
 	export const USER: string;
-	export const VSCODE_PROFILE_INITIALIZED: string;
 	export const npm_execpath: string;
 	export const PATH: string;
 	export const npm_package_json: string;
@@ -43,17 +41,12 @@ declare module '$env/static/private' {
 	export const npm_lifecycle_event: string;
 	export const npm_package_name: string;
 	export const LANG: string;
-	export const VSCODE_GIT_ASKPASS_EXTRA_ARGS: string;
 	export const TURBO_HASH: string;
 	export const npm_package_version: string;
-	export const VSCODE_INJECTION: string;
 	export const SHLVL: string;
 	export const HOME: string;
-	export const VSCODE_GIT_ASKPASS_MAIN: string;
 	export const npm_lifecycle_script: string;
-	export const VSCODE_GIT_IPC_HANDLE: string;
 	export const npm_config_user_agent: string;
-	export const VSCODE_GIT_ASKPASS_NODE: string;
 	export const npm_node_execpath: string;
 	export const COLORTERM: string;
 	export const _: string;
@@ -87,7 +80,6 @@ declare module '$env/static/public' {
  */
 declare module '$env/dynamic/private' {
 	export const env: {
-		VSCODE_GIT_IPC_AUTH_TOKEN: string;
 		TERM_PROGRAM: string;
 		NODE: string;
 		TERM: string;
@@ -95,7 +87,6 @@ declare module '$env/dynamic/private' {
 		TURBO_IS_TUI: string;
 		npm_config_local_prefix: string;
 		USER: string;
-		VSCODE_PROFILE_INITIALIZED: string;
 		npm_execpath: string;
 		PATH: string;
 		npm_package_json: string;
@@ -104,17 +95,12 @@ declare module '$env/dynamic/private' {
 		npm_lifecycle_event: string;
 		npm_package_name: string;
 		LANG: string;
-		VSCODE_GIT_ASKPASS_EXTRA_ARGS: string;
 		TURBO_HASH: string;
 		npm_package_version: string;
-		VSCODE_INJECTION: string;
 		SHLVL: string;
 		HOME: string;
-		VSCODE_GIT_ASKPASS_MAIN: string;
 		npm_lifecycle_script: string;
-		VSCODE_GIT_IPC_HANDLE: string;
 		npm_config_user_agent: string;
-		VSCODE_GIT_ASKPASS_NODE: string;
 		npm_node_execpath: string;
 		COLORTERM: string;
 		_: string;

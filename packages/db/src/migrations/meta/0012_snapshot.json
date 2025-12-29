@@ -3538,16 +3538,7 @@
 		"public.roles": {
 			"name": "roles",
 			"schema": "public",
-			"values": [
-				"user",
-				"admin",
-				"driver",
-				"partner",
-				"supervisor",
-				"accountant",
-				"dev",
-				"editor"
-			]
+			"values": ["user", "admin", "driver", "partner", "supervisor", "accountant", "dev", "editor"]
 		}
 	},
 	"schemas": {},

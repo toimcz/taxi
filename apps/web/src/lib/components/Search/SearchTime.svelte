@@ -1,5 +1,5 @@
 <script lang="ts">
-import { TimerIcon } from "@lucide/svelte";
+import { Timer } from "@lucide/svelte";
 import SearchInput from "./SearchInput.svelte";
 
 type Props = {
@@ -24,7 +24,7 @@ function handleTimeChange(event: Event) {
 
 <SearchInput {id} label="Čas odjezdu/příletu" {error}>
   <div class="flex w-full items-center gap-2">
-    <TimerIcon size={16} class="text-slate-500" />
+    <Timer size={16} class="text-slate-500" />
     <div class="flex-1">
       <input type="time" {id} {value} oninput={handleTimeChange} {name} class="w-auto text-left" />
     </div>

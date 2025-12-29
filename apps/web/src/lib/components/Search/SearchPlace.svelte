@@ -11,13 +11,7 @@ type Props = {
 	error?: boolean;
 };
 
-let {
-	id,
-	name,
-	value = $bindable(""),
-	placeId = $bindable(),
-	error = false,
-}: Props = $props();
+let { id, name, value = $bindable(""), placeId = $bindable(), error = false }: Props = $props();
 
 function setValue(v: string) {
 	value = v;

@@ -8,16 +8,7 @@
  */
 
 import { relations, sql } from "drizzle-orm";
-import {
-	boolean,
-	check,
-	index,
-	pgTable,
-	smallint,
-	text,
-	uuid,
-	varchar,
-} from "drizzle-orm/pg-core";
+import { boolean, check, index, pgTable, smallint, text, uuid, varchar } from "drizzle-orm/pg-core";
 import { amount, defaultColumns, primaryUUID } from "./_custom-types";
 import { bases$ } from "./bases";
 import { QC_CAR, quoteCars$ } from "./quote-cars";
@@ -72,9 +63,7 @@ export const cars$ = pgTable(
 		/** Whether the car is active and available (default: true) */
 		status: boolean("status").default(true).notNull(),
 		/** Array of tags for categorization (max 100 chars each) */
-		tags: varchar("tags", { length: 100 })
-			.array()
-			.default(sql`'{}'::varchar[]`),
+		tags: varchar("tags", { length: 100 }).array().default(sql`'{}'::varchar[]`),
 		/** Reference to the base where this car operates */
 		baseId: uuid("base_id")
 			.notNull()
@@ -104,10 +93,7 @@ export const cars$ = pgTable(
 		/** Ensure passenger capacity is within valid range */
 		check("cars_pax_check", sql`${cars.pax} >= 1 AND ${cars.pax} <= 100`),
 		/** Ensure luggage capacity is within valid range */
-		check(
-			"cars_luggage_check",
-			sql`${cars.luggage} >= 0 AND ${cars.luggage} <= 100`,
-		),
+		check("cars_luggage_check", sql`${cars.luggage} >= 0 AND ${cars.luggage} <= 100`),
 		/** Ensure price per km is non-negative */
 		check("cars_price_km_check", sql`${cars.priceKm} >= 0`),
 		/** Ensure minimum price is non-negative */

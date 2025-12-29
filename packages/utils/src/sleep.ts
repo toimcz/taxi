@@ -26,10 +26,7 @@
  * @param options Optional configuration, including an `AbortSignal` for cancellation.
  * @returns Promise that resolves after the delay or rejects if aborted.
  */
-export function sleep(
-	ms = 0,
-	options?: { signal?: AbortSignal },
-): Promise<void> {
+export function sleep(ms = 0, options?: { signal?: AbortSignal }): Promise<void> {
 	return new Promise((resolve, reject) => {
 		const duration = Number.isFinite(ms) ? Math.max(0, Math.floor(ms)) : 0;
 

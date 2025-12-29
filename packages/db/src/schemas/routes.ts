@@ -34,10 +34,7 @@ export const routes$ = pgTable(
 		...defaultColumns,
 	},
 	(routes) => [
-		uniqueIndex("from_place_id_to_place_id_idx").on(
-			routes.fromPlaceId,
-			routes.toPlaceId,
-		),
+		uniqueIndex("from_place_id_to_place_id_idx").on(routes.fromPlaceId, routes.toPlaceId),
 		index("routes_from_place_id_idx").on(routes.fromPlaceId),
 		index("routes_to_place_id_idx").on(routes.toPlaceId),
 		index("routes_distance_idx").on(routes.distance),

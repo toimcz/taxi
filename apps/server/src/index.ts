@@ -1,60 +1,134 @@
-import "dotenv/config";
 import { join } from "node:path";
-import { cors } from "@elysiajs/cors";
-import { logger } from "@taxi/logger";
-import { Elysia } from "elysia";
-import { apiHandler } from "src/api/handler";
-import { config } from "src/common/config/config";
+import { OpenAPIGenerator } from "@orpc/openapi";
+import { OpenAPIHandler } from "@orpc/openapi/fetch";
+import { onError } from "@orpc/server";
+import { CORSPlugin, ResponseHeadersPlugin } from "@orpc/server/plugins";
+import { experimental_ValibotToJsonSchemaConverter as ValibotToJsonSchemaConverter } from "@orpc/valibot";
+import { router } from "@taxi/api";
+import { contracts } from "@taxi/contracts";
+import { config } from "./config";
 
-// Get absolute path to cert directory (project root)
 const certPath = join(import.meta.dir, "../../../cert");
 const certFile = join(certPath, "localhost.pem");
 const keyFile = join(certPath, "localhost-key.pem");
 
-// Verify certificates exist
-try {
-	const certExists = await Bun.file(certFile).exists();
-	const keyExists = await Bun.file(keyFile).exists();
-	if (!(certExists && keyExists)) {
-		logger.warn(
-			`⚠️  Certificate files not found at ${certPath}. Server will not use HTTPS.`,
-		);
-	}
-} catch (error) {
-	logger.warn(
-		`⚠️  Could not verify certificates: ${error}. Server will not use HTTPS.`,
-	);
+/*
+const handler = new RPCHandler(router, {
+	plugins: [
+		new CORSPlugin(),
+		new CompressionPlugin(),
+		new SimpleCsrfProtectionHandlerPlugin(),
+		new BodyLimitPlugin({
+			maxBodySize: 1024 * 1024 * 100, // 100MB
+		}),
+	],
+	interceptors: [
+		onError((error) => {
+			console.error(error);
+		}),
+	],
+});
+*/
+
+function getSessionIdFromCookie(request: Request): string | undefined {
+	const cookie = request.headers.get("Cookie");
+	if (!cookie) return undefined;
+	const sessionIdCookieName = config.AUTH_COOKIE;
+	const match = cookie.match(new RegExp(`${sessionIdCookieName}=([^;]+)`));
+	return match ? match[1] : undefined;
 }
 
-const app = new Elysia({
-	serve: {
-		tls: {
-			cert: Bun.file(certFile),
-			key: Bun.file(keyFile),
-		},
-	},
-})
-	.use(
-		cors({
-			origin: ({ headers }) => {
-				const origin = headers.get("origin");
-				if (!origin) return true; // Allow same-origin requests
-				return config.TRUSTED_ORIGINS.includes(origin);
-			},
-			methods: ["GET", "POST", "OPTIONS", "PUT", "DELETE", "PATCH"],
-			allowedHeaders: [
-				"Content-Type",
-				"Authorization",
-				"X-Requested-With",
-				"Accept",
-			],
-			credentials: true,
+const handler = new OpenAPIHandler(router, {
+	plugins: [
+		new CORSPlugin({
+			exposeHeaders: ["Content-Disposition"],
 		}),
-	)
-	.use(apiHandler)
-	.get("/", () => "OK")
-	.listen(config.PORT, ({ hostname, port }) => {
-		logger.info(`Server is running on https://${hostname}:${port}`);
-	});
+		new ResponseHeadersPlugin(),
+	],
+	interceptors: [
+		onError((error) => {
+			console.error(JSON.stringify(error, null, 2));
+			console.error(JSON.stringify((error as any).cause ? (error as any).cause : {}, null, 2));
+		}),
+	],
+});
 
-export type App = typeof app;
+const openApiGenerator = new OpenAPIGenerator({
+	schemaConverters: [new ValibotToJsonSchemaConverter()],
+});
+
+const spec = await openApiGenerator.generate(contracts, {
+	info: {
+		title: "My App",
+		version: "0.0.0",
+	},
+	servers: [{ url: "/api" }],
+});
+
+const app = Bun.serve({
+	development: true,
+	port: 4000,
+	tls: {
+		cert: Bun.file(certFile),
+		key: Bun.file(keyFile),
+	},
+	async fetch(request: Request) {
+		console.log(`Incoming request: ${request.method} ${request.url}`);
+
+		if (
+			config.NODE_ENV !== "production" &&
+			request.method === "GET" &&
+			request.url.endsWith("/api/spec.json")
+		) {
+			return new Response(JSON.stringify(spec), {
+				status: 200,
+				headers: { "Content-Type": "application/json" },
+			});
+		}
+		const { matched, response } = await handler.handle(request, {
+			prefix: "/api",
+			context: {
+				sessionId: getSessionIdFromCookie(request),
+			}, // Provide initial context if needed
+		});
+
+		if (matched) {
+			return response;
+		}
+
+		if (request.method === "GET" && request.url.endsWith("/openapi")) {
+			const html = `
+        <!doctype html>
+        <html>
+          <head>
+            <title>My Client</title>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <link rel="icon" type="image/svg+xml" href="https://orpc.dev/icon.svg" />
+          </head>
+          <body>
+            <div id="app"></div>
+
+            <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+            <script>
+              Scalar.createApiReference('#app', {
+                url: '/api/spec.json',
+              })
+            </script>
+          </body>
+        </html>
+      `;
+			return new Response(html, { status: 200, headers: { "Content-Type": "text/html" } });
+		}
+
+		if (request.method === "GET" && request.url.endsWith("/api")) {
+			return new Response("API Server is running", { status: 200 });
+		}
+
+		return new Response("Not found", { status: 404 });
+	},
+});
+
+console.log(`Server running at ${app.url}`);
+
+export type Router = typeof router;

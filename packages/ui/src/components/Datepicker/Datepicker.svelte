@@ -47,14 +47,10 @@ let {
 }: Props = $props();
 
 let el = $state<HTMLInputElement>();
-let datepickerValue = $state<Date | undefined>(
-	value ? new Date(value) : undefined,
-);
+let datepickerValue = $state<Date | undefined>(value ? new Date(value) : undefined);
 let showTooltip = $state(false);
 let startDate = $state(startOfMonth(new Date()));
-let monthYear = $derived<string>(
-	format(startDate, "LLLL yyyy", { locale: cs }),
-);
+let monthYear = $derived<string>(format(startDate, "LLLL yyyy", { locale: cs }));
 let dayOfStartDay = $derived(startDate.getDay() ? startDate.getDay() - 1 : 6);
 let dates = $derived(
 	eachDayOfInterval({

@@ -1,5 +1,5 @@
 import { redirect } from "@sveltejs/kit";
-import { Role } from "@taxi/contracts/common";
+import { Role } from "@taxi/contracts";
 
 export const load = async ({ locals }) => {
 	if (!locals.user || locals.user.roles.includes(Role.USER)) {

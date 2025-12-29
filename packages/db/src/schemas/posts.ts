@@ -142,15 +142,9 @@ export const posts$ = pgTable(
 		// Composite indexes for common queries
 		index("posts_public_publish_at_index").on(table.public, table.publishAt),
 		index("posts_category_public_index").on(table.categoryId, table.public),
-		index("posts_category_publish_at_index").on(
-			table.categoryId,
-			table.publishAt,
-		),
+		index("posts_category_publish_at_index").on(table.categoryId, table.publishAt),
 		index("posts_public_created_at_index").on(table.public, table.createdAt),
-		index("posts_created_by_created_at_index").on(
-			table.createdById,
-			table.createdAt,
-		),
+		index("posts_created_by_created_at_index").on(table.createdById, table.createdAt),
 	],
 );
 

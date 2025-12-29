@@ -100,9 +100,7 @@ export class SearchStore {
 
 	get passengers() {
 		return (
-			this.#search.current.adults +
-			this.#search.current.children +
-			this.#search.current.infants
+			this.#search.current.adults + this.#search.current.children + this.#search.current.infants
 		);
 	}
 

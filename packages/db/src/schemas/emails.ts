@@ -30,16 +30,9 @@
  * ```
  */
 
-import { EmailStatus } from "@taxi/contracts/common";
+import { EmailStatus } from "@taxi/contracts";
 import { relations } from "drizzle-orm";
-import {
-	index,
-	pgEnum,
-	pgTable,
-	text,
-	uuid,
-	varchar,
-} from "drizzle-orm/pg-core";
+import { index, pgEnum, pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
 import { defaultColumns, primaryUUID } from "./_custom-types";
 import { users$ } from "./auth";
 
@@ -47,10 +40,7 @@ import { users$ } from "./auth";
  * Email status values extracted from the shared types package
  * Ensures consistency between frontend and backend status definitions
  */
-const emailStatusValues = Object.values(EmailStatus) as unknown as readonly [
-	string,
-	...string[],
-];
+const emailStatusValues = Object.values(EmailStatus) as unknown as readonly [string, ...string[]];
 
 /**
  * PostgreSQL enum for email status tracking
@@ -139,10 +129,7 @@ export const emails$ = pgTable(
 		 * Composite index for user email history
 		 * Optimizes: SELECT * FROM emails WHERE created_by_id = ? ORDER BY created_at DESC
 		 */
-		index("emails_user_created_at_index").on(
-			emails.createdById,
-			emails.createdAt,
-		),
+		index("emails_user_created_at_index").on(emails.createdById, emails.createdAt),
 
 		/**
 		 * Composite index for email tracking by recipient and status
@@ -244,6 +231,4 @@ export type EmailInsert = typeof emails$.$inferInsert;
  *   .where(eq(emails$.id, emailId));
  * ```
  */
-export type EmailUpdate = Partial<
-	Omit<EmailInsert, "id" | "providerId" | "createdAt">
->;
+export type EmailUpdate = Partial<Omit<EmailInsert, "id" | "providerId" | "createdAt">>;

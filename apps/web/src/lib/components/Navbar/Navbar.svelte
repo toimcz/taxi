@@ -1,11 +1,11 @@
 <script lang="ts">
-import { MenuIcon, XIcon } from "@lucide/svelte";
+import { Menu, X } from "@lucide/svelte";
+import { useLogout } from "@taxi/client-auth";
 import { cubicOut } from "svelte/easing";
 import { slide } from "svelte/transition";
 import { invalidateAll } from "$app/navigation";
 import { page } from "$app/state";
 import { LogoText } from "$lib/components/Logo";
-import { useLogout } from "$lib/hooks/use-auth.svelte";
 import { useToastStore } from "$lib/stores";
 
 type Page = {
@@ -21,13 +21,13 @@ let { pages }: Props = $props();
 let showLinks = $state(false);
 
 const toast = useToastStore();
-const { submit: submitLogout } = useLogout({
+const form = useLogout({
 	onSuccess: async () => {
 		await invalidateAll();
 		toast.add("message", "Odhlášení proběhlo úspěšně");
 	},
-	onError: async () => {
-		toast.add("error", "Nepodařilo se odhlásit");
+	onError: (message: string) => {
+		toast.add("error", message);
 	},
 });
 const staticPages: Page[] = [
@@ -81,7 +81,7 @@ $effect(() => {
             <a href="/ucet">Můj účet</a>
           </li>
           <li>
-            <form method="POST" onsubmit={submitLogout}>
+            <form method="POST" onsubmit={form.submit}>
               <button type="submit">Odhlásit se</button>
             </form>
           </li>
@@ -90,9 +90,9 @@ $effect(() => {
       <div class="flex items-center lg:hidden">
         <button type="button" onclick={() => (showLinks = !showLinks)}>
           {#if showLinks}
-            <XIcon />
+            <X />
           {:else}
-            <MenuIcon />
+            <Menu />
           {/if}
         </button>
       </div>
@@ -122,7 +122,7 @@ $effect(() => {
             <a href="/ucet">Můj účet</a>
           </li>
           <li>
-            <form method="POST" onsubmit={submitLogout}>
+            <form method="POST" onsubmit={form.submit}>
               <button type="submit">Odhlásit se</button>
             </form>
           </li>

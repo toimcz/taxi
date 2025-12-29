@@ -37,14 +37,7 @@
  */
 
 import { relations } from "drizzle-orm";
-import {
-	index,
-	numeric,
-	pgTable,
-	text,
-	uuid,
-	varchar,
-} from "drizzle-orm/pg-core";
+import { index, numeric, pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
 import { countries$, quotes$ } from ".";
 import { defaultColumns, primaryUUID } from "./_custom-types";
 
@@ -85,9 +78,9 @@ export const places$ = pgTable(
 		/** Type of place (e.g., "city", "airport", "hotel", "tourist_attraction") */
 		type: varchar("type", { length: 160 }).notNull(),
 		/** Latitude coordinate (decimal degrees, -90 to 90) */
-		lat: numeric("lat", { precision: 10, scale: 6 }).$type<number>().notNull(),
+		lat: numeric("lat", { precision: 10, scale: 6, mode: "number" }).notNull(),
 		/** Longitude coordinate (decimal degrees, -180 to 180) */
-		lng: numeric("lng", { precision: 11, scale: 6 }).$type<number>().notNull(),
+		lng: numeric("lng", { precision: 11, scale: 6, mode: "number" }).notNull(),
 		...defaultColumns,
 	},
 	(table) => [
@@ -106,11 +99,7 @@ export const places$ = pgTable(
 		index("places_city_type_idx").on(table.city, table.type),
 		index("places_location_idx").on(table.lat, table.lng),
 		index("places_search_idx").on(table.place, table.city, table.label),
-		index("places_country_location_idx").on(
-			table.countryId,
-			table.lat,
-			table.lng,
-		),
+		index("places_country_location_idx").on(table.countryId, table.lat, table.lng),
 	],
 );
 

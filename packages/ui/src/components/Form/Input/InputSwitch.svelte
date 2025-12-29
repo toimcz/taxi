@@ -1,9 +1,13 @@
 <script lang="ts">
+import { Info } from "@lucide/svelte";
+import Tooltip from "../../Tooltip/Tooltip.svelte";
+
 type Props = {
 	id: string;
 	label: string;
 	name: string;
-	checked: boolean;
+	checked?: boolean;
+	disabled?: boolean;
 	error?: string[] | undefined;
 	setValue?: (value: boolean) => void;
 };
@@ -13,49 +17,134 @@ let {
 	label,
 	name,
 	checked = $bindable(false),
+	disabled = false,
 	error,
 	setValue,
 }: Props = $props();
 
-function setInputValue(e: Event) {
-	const v = (e.target as HTMLInputElement).checked;
+const switchId = $derived(`${id}-switch`);
+const errorId = $derived(error?.length ? `${id}-error` : undefined);
+
+let focused = $state(false);
+let hovered = $state(false);
+
+function handleChange(e: Event) {
+	if (disabled) return;
+	const newValue = (e.target as HTMLInputElement).checked;
+	checked = newValue;
 	error = undefined;
-	setValue?.(v);
+	setValue?.(newValue);
+}
+
+function handleKeyDown(e: KeyboardEvent) {
+	if (disabled) return;
+	// Space or Enter to toggle
+	if (e.key === " " || e.key === "Enter") {
+		e.preventDefault();
+		const newValue = !checked;
+		checked = newValue;
+		error = undefined;
+		setValue?.(newValue);
+	}
+}
+
+function handleFocus() {
+	focused = true;
+}
+
+function handleBlur() {
+	focused = false;
+}
+
+function handleMouseEnter() {
+	if (!disabled) hovered = true;
+}
+
+function handleMouseLeave() {
+	hovered = false;
 }
 </script>
 
-<label for="hid-{id}" class="flex cursor-pointer items-center rounded-xl bg-transparent p-2">
-	<div class="relative">
-		<input id="hid-{id}" bind:checked onchange={setInputValue} type="checkbox" class="hidden" />
-		<input {id} type="text" {name} value={checked} class="hidden" />
+<div class="relative flex flex-col gap-2">
+  <label for={switchId} class="text-xs font-semibold uppercase tracking-wide text-gray-700">
+    {label}
+  </label>
 
-		<div class="toggle__line h-3 w-7 rounded-full bg-red-400 shadow-inner"></div>
+  <div class="flex items-center">
+    <!-- Accessible switch container -->
+    <label
+      for={switchId}
+      class="relative inline-flex cursor-pointer items-center group"
+      class:cursor-not-allowed={disabled}
+      onmouseenter={handleMouseEnter}
+      onmouseleave={handleMouseLeave}
+    >
+      <!-- Actual checkbox input (visually hidden but accessible) -->
+      <input
+        id={switchId}
+        type="checkbox"
+        role="switch"
+        aria-checked={checked}
+        aria-label={label}
+        aria-describedby={errorId}
+        aria-disabled={disabled}
+        {disabled}
+        class="sr-only"
+        {checked}
+        onchange={handleChange}
+        onkeydown={handleKeyDown}
+        onfocus={handleFocus}
+        onblur={handleBlur}
+      />
 
-		<div class="toggle__dot absolute h-5 w-5 rounded-full bg-red-600 shadow"></div>
-	</div>
+      <!-- Hidden input for form submission with actual boolean value -->
+      <input type="hidden" {name} value={checked ? 'true' : 'false'} />
 
-	<div class="ml-5 text-sm font-semibold uppercase">{label}</div>
-</label>
-{#if error}
-	{#each error as err, i (i)}
-		<p class="text-sm italic text-red-600 dark:text-red-300">{err}</p>
-	{/each}
-{/if}
+      <!-- Visual switch track -->
+      <span
+        class="relative inline-flex h-6 w-10 shrink-0 items-center rounded-full transition-all duration-300 ease-in-out"
+        class:bg-emerald-500={checked && !disabled}
+        class:bg-emerald-600={checked && hovered && !disabled}
+        class:bg-gray-200={!checked && !disabled}
+        class:bg-gray-300={!checked && hovered && !disabled}
+        class:opacity-50={disabled}
+        class:ring-1={focused}
+        class:ring-emerald-400={focused && checked}
+        class:ring-blue-400={focused && !checked}
+        class:ring-offset-1={focused}
+        class:shadow-inner={!checked}
+        class:shadow-md={checked}
+      >
+        <!-- Switch thumb -->
+        <span
+          class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition-all duration-300 ease-in-out"
+          class:translate-x-4.5={checked}
+          class:translate-x-0.5={!checked}
+          class:scale-105={hovered && !disabled}
+        ></span>
+      </span>
+    </label>
+  </div>
+
+  {#if error?.length}
+    <div class="absolute top-0 right-0">
+      <Tooltip content={error.join(', ')}>
+        <Info size={16} class="text-red-500" />
+      </Tooltip>
+    </div>
+  {/if}
+</div>
 
 <style>
-	.toggle__dot {
-		top: -0.25rem;
-		left: -0.25rem;
-		transition: all 0.3s ease-in-out;
-	}
-	.toggle__line {
-		transition: all 0.3s ease-in-out;
-	}
-	input:checked ~ .toggle__dot {
-		transform: translateX(100%);
-		background-color: #48bb78 !important;
-	}
-	input:checked ~ .toggle__line {
-		background-color: #abeec7 !important;
-	}
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
 </style>

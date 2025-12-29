@@ -1,17 +1,21 @@
 <script lang="ts">
+import { useRegisterPassword } from "@taxi/client-auth";
 import { InputEmail, InputPassword, InputPhone, InputText } from "@taxi/ui";
-import { goto } from "$app/navigation";
+import { goto, invalidateAll } from "$app/navigation";
 import { SubmitButton } from "$lib/components/Button";
-import { useRegisterPassword } from "$lib/hooks/use-auth.svelte";
+import { useToastStore } from "$lib/stores";
+
+const toast = useToastStore();
 
 // DO NOT USE DESTRUCTURING HERE, IT WILL BREAK THE FORM
 const form = useRegisterPassword({
-	onSuccess: (toast) => {
-		toast.add("message", "Registrace byla úspěšná.");
+	onSuccess: async () => {
+		await invalidateAll();
+		toast.add("message", "Účet byl úspěšně vytvořen.");
 		goto("/");
 	},
-	onError: (toast, error) => {
-		toast.add("error", error ?? "Nepodařilo se zaregistrovat.");
+	onError: (message: string) => {
+		toast.add("error", message);
 	},
 });
 </script>
@@ -19,7 +23,7 @@ const form = useRegisterPassword({
 <div>
   <h1 class="text-center text-xl font-bold mb-1">Vytvořit nový účet s heslem</h1>
   <p class="text-xs text-gray-500 text-center">Budete se přihlašovat emailem a heslem.</p>
-  <form method="POST" class="mt-5 grid grid-cols-2 gap-4" onsubmit={form.submit}>
+  <form method="POST" class="mt-5 grid grid-cols-2 gap-2" onsubmit={form.submit}>
     <div class="col-span-2">
       <InputEmail id="email" name="email" label="Email" value="" error={form.issues?.email} />
     </div>

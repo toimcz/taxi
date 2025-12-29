@@ -18,7 +18,7 @@ import {
 	Settings,
 	Users,
 } from "@lucide/svelte";
-import type { Role } from "@taxi/contracts/common";
+import type { Role } from "@taxi/contracts";
 import { onMount } from "svelte";
 import { enhance } from "$app/forms";
 import { page } from "$app/state";
@@ -160,7 +160,7 @@ const links: Link[] = [
       </button>
     </li>
     {#each links as { name, href, roles, icon: Icon }}
-      {#if !roles || roles.length === 0 || roles.some( (role) => page.data.auth?.role.includes(role), )}
+      {#if !roles || roles.length === 0 || roles.some( (role) => page.data.auth?.role.includes(role) )}
         <li class:active={page.url.pathname.includes(href)}>
           <a {href}>
             <Icon size={ICON_SIZE} />

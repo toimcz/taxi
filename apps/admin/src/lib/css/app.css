@@ -113,43 +113,24 @@ select {
 	padding-right: 2.5rem;
 }
 
-.form-group {
-	@apply bg-two relative flex flex-col gap-0 rounded-xl border-2 border-transparent px-2.5 pb-1 pt-1.5;
-}
-
-.form-group label {
-	@apply text-xs font-medium uppercase text-slate-500;
-}
-
-.form-group.error {
-	@apply border-red-300;
-}
-
-.form-control {
-	@apply w-full border-none bg-transparent outline-none;
-}
-
 /* Button */
 
+button:hover {
+	@apply cursor-pointer;
+}
+
 .btn {
-	@apply mt-2 inline-block rounded-xl border-2 border-transparent px-4 py-1.5 text-center text-[15px] font-normal;
+	@apply mt-2 inline-block rounded-xl px-4 py-2 text-center text-[15px] font-normal;
+	@apply shadow-2xs hover:shadow-none;
 	letter-spacing: 0.05em;
 }
 
 .btn-primary {
-	@apply bg-primary text-white;
-}
-
-.btn-link {
-	@apply text-primary bg-slate-100;
-}
-
-.btn-link:hover:not(.btn-link-active) {
-	@apply border-primary bg-white;
-}
-
-.btn-link-active {
-	@apply bg-primary text-white;
+	@apply text-white font-light;
+	@apply bg-linear-to-r from-slate-800 from-10% via-50% via-slate-700 to-slate-900 to-90%;
+	@apply transition-colors duration-300;
+	@apply hover:from-slate-700 hover:via-50% hover:via-slate-900 hover:to-slate-700;
+	@apply border border-slate-500 hover:border-slate-800;
 }
 
 .btn-secondary {
@@ -161,7 +142,11 @@ select {
 }
 
 .btn-light {
-	@apply bg-slate-50 text-black;
+	@apply text-slate-900 font-light;
+	@apply bg-linear-to-r from-slate-100 from-10% via-50% via-slate-50 to-slate-100 to-90%;
+	@apply transition-colors duration-300;
+	@apply hover:from-slate-100 hover:via-50% hover:via-slate-200 hover:to-slate-100;
+	@apply border border-slate-200 hover:border-slate-500;
 }
 
 .btn-danger {
@@ -176,6 +161,9 @@ select {
 	@apply bg-yellow-500 text-white;
 }
 
+.btn-google {
+	@apply bg-linear-to-r from-red-100 from-10% via-yellow-50 via-30% to-blue-100 to-90% hover:from-red-200 hover:via-yellow-100 hover:to-blue-200 transition-colors duration-200 } .btn-sm { @apply rounded-lg px-3 py-1.5 text-sm;
+}
 .btn-sm {
 	@apply rounded-lg px-3 py-1.5 text-sm;
 }
@@ -208,8 +196,7 @@ hr {
 .datatable .td,
 .datatable .th {
 	font-weight: 400;
-	transition-property:
-		color, background-color, border-color, text-decoration-color, fill, stroke;
+	transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	transition-duration: 150ms;
 	white-space: nowrap;
@@ -230,8 +217,7 @@ hr {
 }
 .datatable .th {
 	font-weight: 300;
-	transition-property:
-		color, background-color, border-color, text-decoration-color, fill, stroke;
+	transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	transition-duration: 150ms;
 	white-space: nowrap;

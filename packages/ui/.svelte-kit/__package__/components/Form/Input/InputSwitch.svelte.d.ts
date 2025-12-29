@@ -2,7 +2,8 @@ type Props = {
     id: string;
     label: string;
     name: string;
-    checked: boolean;
+    checked?: boolean;
+    disabled?: boolean;
     error?: string[] | undefined;
     setValue?: (value: boolean) => void;
 };

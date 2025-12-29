@@ -105,5 +105,4 @@ export class SessionStorage<T> {
 	}
 }
 
-export const session = <T>(key: string, initial?: T) =>
-	new SessionStorage<T>(key, initial);
+export const session = <T>(key: string, initial?: T) => new SessionStorage<T>(key, initial);

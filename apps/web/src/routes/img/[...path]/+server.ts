@@ -1,6 +1,6 @@
 import { error } from "@sveltejs/kit";
-import { logger } from "@taxi/logger";
 import { DO_URL } from "$env/static/private";
+import { log } from "$lib/utils/log";
 import type { RequestHandler } from "./$types";
 
 // Allowed image extensions and their MIME types
@@ -13,6 +13,8 @@ const ALLOWED_EXTENSIONS = {
 	svg: "image/svg+xml",
 	avif: "image/avif",
 } as const;
+
+const logger = log("img-handler");
 
 function sanitizePath(pathname: string): string {
 	// Remove leading slash and normalize path

@@ -30,9 +30,9 @@ export const rideDetails$ = pgTable("ride_details", {
 	carId: uuid("car_id")
 		.notNull()
 		.references(() => cars$.id),
-	quoteId: uuid("quote_id")
-		.notNull()
-		.references(() => quotes$.id),
+	quoteId: uuid("quote_id").references(() => quotes$.id, {
+		onDelete: "set null",
+	}),
 });
 
 export const RIDE_DETAIL_CAR = "ride_detail_car";

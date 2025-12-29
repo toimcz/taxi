@@ -1,15 +1,10 @@
 <script lang="ts">
 import { MoveRight } from "@lucide/svelte";
+import type { PostItem } from "@taxi/contracts";
 import { CardLink } from "@taxi/ui";
 
 type Props = {
-	post: {
-		title: string;
-		slug: string;
-		photo: string;
-		description: string;
-		categorySlug: string;
-	};
+	post: PostItem;
 };
 
 const { post }: Props = $props();

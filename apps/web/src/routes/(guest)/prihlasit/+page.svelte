@@ -1,11 +1,15 @@
 <script lang="ts">
 import { Lock, Mail, User } from "@lucide/svelte";
+import { useGoogleLogin } from "@taxi/client-auth";
 import { Card, Google, Spinner } from "@taxi/ui";
 import { goto } from "$app/navigation";
+import { PUBLIC_APP_URL } from "$env/static/public";
 import LoginEmail from "$lib/components/Auth/LoginEmail.svelte";
 import LoginPassword from "$lib/components/Auth/LoginPassword.svelte";
 import { WebPage } from "$lib/components/WebPage";
-import { useGoogleLogin } from "$lib/hooks/use-auth.svelte";
+import { useToastStore } from "$lib/stores";
+
+const toast = useToastStore();
 
 const title = "Přihlášení";
 const description = "Přihlášení do systému";
@@ -13,13 +17,12 @@ const description = "Přihlášení do systému";
 type AuthMethod = "password" | "magic-link";
 let authMethod = $state<AuthMethod>("password");
 
-const { processing, submit } = useGoogleLogin({
-	onSuccess: async (toast) => {
-		toast.add("message", "Přihlášení bylo úspěšné.");
+const googleLogin = useGoogleLogin(PUBLIC_APP_URL, {
+	onSuccess: async () => {
 		goto("/");
 	},
-	onError: (toast) => {
-		toast.add("error", "Nepodařilo se přihlásit přes Google.");
+	onError: (message: string) => {
+		toast.add("error", message);
 	},
 });
 </script>
@@ -33,12 +36,12 @@ const { processing, submit } = useGoogleLogin({
         <button
           type="button"
           class="btn btn-google"
-          disabled={processing}
-          onclick={submit}
+          disabled={googleLogin.processing}
+          onclick={googleLogin.submit}
           aria-label="Přihlásit se přes Google"
         >
           <div class="flex items-center gap-2 justify-center">
-            {#if processing}
+            {#if googleLogin.processing}
               <Spinner />
             {:else}
               <Google />

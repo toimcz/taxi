@@ -8,12 +8,7 @@ type Props = {
 	robots?: string;
 };
 
-const {
-	title,
-	description,
-	robots = "index, follow",
-	children,
-}: Props = $props();
+const { title, description, robots = "index, follow", children }: Props = $props();
 </script>
 
 <svelte:head>

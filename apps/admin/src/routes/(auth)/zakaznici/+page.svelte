@@ -11,9 +11,7 @@ let description = "Seznam zákazníků";
 
 let users = usersSearch({ query: "" });
 
-const handleSearch = (
-	e: Event & { currentTarget: EventTarget & HTMLInputElement },
-) => {
+const handleSearch = (e: Event & { currentTarget: EventTarget & HTMLInputElement }) => {
 	const target = e.target as HTMLInputElement;
 	usersSearch({ query: target.value }).refresh();
 };
@@ -32,7 +30,7 @@ onMount(async () => {
         <p class="text-2xl font-extrabold">{title}</p>
       </div>
       <div class="flex items-center gap-x-3">
-        <div class=" text-slate-600">Počet: {users.current?.meta.total || 0}</div>
+        <div class=" text-slate-600">Počet: {users.current?.meta?.total || 0}</div>
         <a href="/zakaznici/novy" class="flex items-center">
           <CirclePlus size={18} class="text-blue-400 hover:text-blue-500" />
         </a>
@@ -61,8 +59,8 @@ onMount(async () => {
           <p>oops!</p>
         {:else if users.loading}
           <p>loading...</p>
-        {:else if users.current?.users}
-          {#each users.current.users as user (user.id)}
+        {:else if users.current?.data}
+          {#each users.current.data as user (user.id)}
             {@const link = `/zakaznici/${user.id}`}
             <div class="tr">
               <a class="td" href={link}>{user.name}</a>
@@ -87,8 +85,8 @@ onMount(async () => {
         <p>oops!</p>
       {:else if users.loading}
         <p>loading...</p>
-      {:else if users.current?.users}
-        {#each users.current.users as user (user.id)}
+      {:else if users.current?.data}
+        {#each users.current.data as user (user.id)}
           {@const link = `/zakaznici/${user.id}`}
           <div class="flex items-center justify-between py-1">
             <a class="td" href={link}>{user.name}</a>

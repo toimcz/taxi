@@ -1,0 +1,419 @@
+---
+description: Enforce secure authentication conventions for all methods (Email/Password, Magic Link, OAuth2) across the application.
+alwaysApply: true
+glob: "**/*.ts,**/*.tsx"
+---
+
+# 🔒 Core Security Conventions (All Methods)
+
+## Secret Management
+
+1. **Environment Variables:** All cryptographic keys (JWT/session secret, OAuth client secrets, API keys) **MUST** be stored as **Environment Variables** via `process.env.SECRET_NAME` and **NEVER** hardcoded in source code.
+
+2. **Secret Rotation:** Implement a strategy for rotating secrets periodically. Document the rotation procedure in your deployment documentation.
+
+3. **Secret Validation:** Use Valibot schemas in `config.ts` to validate all required environment variables at startup. The application **MUST** fail fast if critical secrets are missing.
+
+## Password Hashing
+
+4. **Hashing Algorithm:** Always use **Bun.password.hash()** for password hashing (uses Argon2id internally with secure defaults). **FORBIDDEN:** Never use MD5, SHA1, SHA256, or any non-password-specific hashing algorithms.
+
+5. **Hash Verification:** Use **Bun.password.verify()** for password verification. This function performs constant-time comparison internally to prevent timing attacks.
+
+6. **Password Storage:** Store password hashes in the `identities` table with proper indexing. **FORBIDDEN:** Never store plaintext passwords or reversible encryption.
+
+## Rate Limiting
+
+7. **Authentication Endpoints:** All public authentication endpoints (`/login/password`, `/login/email`, `/register/*`, `/magiclink`) **MUST** have robust **Rate Limiting** implemented to prevent brute force and DoS attacks:
+   - **Login attempts:** Maximum 5 attempts per IP per 15 minutes
+   - **Magic link requests:** Maximum 3 requests per email per 15 minutes
+   - **Registration:** Maximum 3 attempts per IP per hour
+   - **OAuth callbacks:** Maximum 10 attempts per IP per 5 minutes
+
+8. **Rate Limiting Implementation:** Use Redis-backed rate limiting with sliding window algorithm. Implement rate limiting as Elysia middleware that runs before authentication handlers.
+
+9. **Rate Limit Responses:** Return **429 Too Many Requests** with a `Retry-After` header when rate limits are exceeded. Do NOT reveal whether an email exists in error messages.
+
+## Session Management
+
+10. **Session Storage:** Store sessions in **Redis** with automatic TTL expiration (currently 30 days). Use the prefix `session:` for all session keys.
+
+11. **Session Expiration:** Configure appropriate session lifetimes:
+    - **Regular sessions:** 30 days with automatic expiration
+    - **"Remember me" sessions:** 90 days maximum
+    - **Sensitive operations:** Require re-authentication for critical actions (profile changes, payment)
+
+12. **Session Validation:** Always validate session expiration and integrity on every request. If a session is expired, **delete it from Redis** and return 401 Unauthorized.
+
+13. **Session Refresh:** Implement session refresh logic to extend expiration on active usage. Refresh sessions that are more than 50% through their lifetime on authenticated requests.
+
+14. **Concurrent Sessions:** Allow multiple concurrent sessions per user but implement a maximum limit (e.g., 5 active sessions). Remove oldest sessions when limit is exceeded.
+
+# 🍪 Cookie Security
+
+15. **Cookie Attributes:** Session cookies **MUST** use all of these security attributes:
+    - `httpOnly: true` - Prevents XSS attacks
+    - `secure: true` - HTTPS only (disable only in development)
+    - `sameSite: 'lax'` - CSRF protection
+    - `path: '/'` - Available across entire domain
+    - `expires` or `maxAge` - Explicit expiration matching session TTL
+
+16. **Cookie Naming:** Use the `__Host-` prefix for session cookies in production (e.g., `__Host-session`) to bind cookies to the exact domain and require HTTPS. This is currently configured via `AUTH_COOKIE` environment variable.
+
+17. **Cookie Deletion:** When logging out, explicitly delete the session cookie by setting `maxAge: 0` and `expires: new Date(0)` with all original attributes.
+
+# 📧 Email and Password Authentication
+
+## Registration
+
+18. **Password Complexity:** Enforce minimum password requirements at the Valibot schema level:
+    ```typescript
+    // Minimum requirements
+    - Length: 8 characters (current)
+    - RECOMMENDED: Add complexity validation for production:
+      * At least one uppercase letter
+      * At least one lowercase letter
+      * At least one number
+      * At least one special character
+    ```
+
+19. **Email Validation:** Always validate email format using Valibot's `email()` validator and normalize to lowercase before storage.
+
+20. **Duplicate Prevention:** Check for existing users by email **before** hashing passwords to avoid unnecessary expensive operations. Return a generic error message to avoid email enumeration.
+
+21. **Password Confirmation:** Require password confirmation during registration and validate equality using Valibot's `partialCheck()` with forward error reporting to `passwordConfirm` field.
+
+## Login
+
+22. **Generic Error Messages:** Always return the **same generic error message** for invalid credentials ("Invalid email or password") regardless of whether the email exists or the password is wrong. **FORBIDDEN:** Do not reveal whether an email exists in the system.
+
+23. **Timing Attack Prevention:** The `Bun.password.verify()` function performs constant-time comparison. Always await the full verification even if the user doesn't exist to prevent timing attacks.
+
+24. **Failed Login Tracking:** Implement account lockout after N failed login attempts (recommended: 5 attempts). Store failed attempt count in Redis with TTL (e.g., 15 minutes).
+
+25. **Login Notification:** Send security notification emails after successful login from new devices or locations (optional but recommended for high-security applications).
+
+26. **Last Login Tracking:** Update `lastLoginAt` timestamp on successful authentication to track user activity and detect suspicious behavior.
+
+# ✨ Magic Link Authentication
+
+## Token Generation
+
+27. **Token Entropy:** Generate magic link tokens using **`crypto.randomBytes(32).toString('hex')`** for 256 bits of entropy. **FORBIDDEN:** Never use predictable token generation (Math.random, UUIDs, etc.).
+
+28. **Token Storage:** Store magic link tokens in **Redis** with the prefix `magic-link:` and automatic TTL expiration.
+
+29. **Token Expiration:** Magic link tokens **MUST** expire within **5-15 minutes** (currently 30 minutes - **SHOULD BE REDUCED**). Shorter expiration reduces attack window.
+
+## Security
+
+30. **Single-Use Tokens:** Magic link tokens **MUST** be single-use. Immediately delete the token from Redis after validation (current implementation: ✅ correct).
+
+31. **Email Verification:** Only send magic links to email addresses that **already exist** in the system. For registration flows, use a separate passwordless registration endpoint.
+
+32. **Silent Failures:** If a user requests a magic link for a non-existent email, return **success** but don't send an email. This prevents email enumeration attacks.
+
+33. **Redirect Validation:** Validate the `redirectUrl` parameter against a whitelist of allowed origins (use `TRUSTED_ORIGINS` from config). **FORBIDDEN:** Allow arbitrary redirects (open redirect vulnerability).
+
+34. **Link Construction:** Construct magic links as: `{ORIGIN}/prihlasit/{token}`. Include the redirect URL as metadata, not in the URL itself.
+
+# 🌐 Google OAuth2 Authentication
+
+## Configuration
+
+35. **OAuth Scopes:** Request **only** the minimum required scopes:
+    - `openid` - Required for OIDC
+    - `profile` - User's basic profile
+    - `email` - User's email address
+
+    **FORBIDDEN:** Request additional scopes without explicit user consent and business justification.
+
+36. **Redirect URI:** Register exact callback URLs with Google Console. Use the environment variable `GOOGLE_CALLBACK_URL` and **NEVER** allow dynamic callback URLs.
+
+## OAuth Flow Security
+
+37. **State Parameter:** Always generate and verify the **`state`** parameter using `arctic.generateState()` to prevent CSRF attacks (current implementation: ✅ correct).
+
+38. **State Storage:** Store OAuth state in Redis with:
+    - Key pattern: `google_oauth_state:{state}`
+    - Value: JSON containing `{ redirectUrl, codeVerifier }`
+    - TTL: 10 minutes (current implementation: ✅ correct)
+
+39. **State Validation:** Validate that the state from the callback matches the stored state. If validation fails, reject the request with 400 Bad Request. **Delete the state** from Redis after successful validation to prevent replay attacks.
+
+40. **Code Verifier (PKCE):** Always use PKCE (Proof Key for Code Exchange) with `arctic.generateCodeVerifier()`. This protects against authorization code interception attacks (current implementation: ✅ correct).
+
+## Token Verification
+
+41. **Token Validation:** The Arctic library handles token validation. Ensure these checks are performed:
+    - **Issuer (iss):** Must be `https://accounts.google.com` or `accounts.google.com`
+    - **Audience (aud):** Must match your `GOOGLE_CLIENT_ID`
+    - **Expiration (exp):** Token must not be expired
+    - **Issued At (iat):** Token must not be from the future
+
+42. **Access Token Storage:** Store access tokens in the `identities` table for API access. Update tokens on each successful authentication.
+
+43. **Refresh Token Storage:** Store refresh tokens securely in the `identities` table. Use them to obtain new access tokens when needed.
+
+44. **Token Expiration Tracking:** Store `accessTokenExpiresAt` in the identities table to know when to refresh tokens.
+
+## User Linking
+
+45. **Account Linking:** Link OAuth accounts to existing users by email. If a user registers with password and later logs in with Google (same email), link the accounts instead of creating duplicates.
+
+46. **Identity Provider Tracking:** Store the OAuth provider (`GOOGLE`, `PASSWORD`, `EMAIL`) in the `identities` table to support multiple authentication methods per user.
+
+47. **OAuth Profile Updates:** On each OAuth login, update the user's profile (name, picture) with fresh data from the provider to keep information current.
+
+# 🔐 Advanced Security Practices
+
+## Session Security
+
+48. **Session Invalidation:** Implement "logout everywhere" functionality to invalidate all sessions for a user:
+    ```typescript
+    // Delete all sessions for a user
+    const keys = await redis.keys(`session:*`);
+    for (const key of keys) {
+      const session = await redis.get(key);
+      if (session.userId === userId) {
+        await redis.del(key);
+      }
+    }
+    ```
+
+49. **Session Fixation Prevention:** Always generate a **new session ID** after authentication. Never reuse pre-authentication session IDs.
+
+50. **Suspicious Activity Detection:** Log and alert on suspicious patterns:
+    - Multiple failed login attempts
+    - Logins from unusual locations
+    - Concurrent sessions from different countries
+    - Password changes followed by immediate logout of other sessions
+
+## Database Security
+
+51. **Cascade Deletion:** Use `onDelete: 'cascade'` for user-owned resources (sessions, identities, magic links) to ensure cleanup when users are deleted (current implementation: ✅ correct).
+
+52. **Soft Deletion:** For audit trails, consider implementing soft deletion for users with `deletedAt` timestamp instead of hard deletion.
+
+53. **Index Foreign Keys:** All foreign keys (userId) **MUST** be indexed for query performance (current implementation: ✅ correct).
+
+## Error Handling
+
+54. **Generic Error Messages:** Return generic error messages to clients. Log detailed errors server-side using the logger.
+
+55. **Error Logging:** Log all authentication failures with context (IP, user agent, timestamp) for security monitoring.
+
+56. **No Sensitive Data in Logs:** **FORBIDDEN:** Never log passwords, tokens, session IDs, or other sensitive data. Redact these values in error messages.
+
+## Input Validation
+
+57. **Schema Validation:** Use Valibot schemas for **all** authentication inputs at both the handler level and service level.
+
+58. **Email Normalization:** Normalize email addresses to lowercase before comparison and storage to prevent duplicate accounts with different casing.
+
+59. **Whitespace Trimming:** Trim whitespace from email and name fields during registration and login.
+
+## HTTPS and Transport Security
+
+60. **HTTPS Only:** Run the application over HTTPS in production. Use Let's Encrypt for free SSL certificates.
+
+61. **HSTS Headers:** Set `Strict-Transport-Security` header to force HTTPS:
+    ```
+    Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+    ```
+
+62. **Secure Development:** In local development with self-signed certificates, set `secure: false` for cookies but **ALWAYS** use `secure: true` in staging and production.
+
+# 🚨 Security Monitoring and Incident Response
+
+63. **Audit Logging:** Log all authentication events:
+    - Successful logins
+    - Failed login attempts
+    - Password changes
+    - Account creation
+    - OAuth connections
+    - Session invalidations
+
+64. **Monitoring Alerts:** Set up alerts for:
+    - Unusual number of failed login attempts
+    - Mass account creation (potential bot attack)
+    - Geographic anomalies
+    - Session hijacking patterns
+
+65. **Security Headers:** Implement security headers via Elysia middleware:
+    ```typescript
+    - X-Content-Type-Options: nosniff
+    - X-Frame-Options: DENY
+    - X-XSS-Protection: 1; mode=block
+    - Content-Security-Policy: default-src 'self'
+    - Referrer-Policy: strict-origin-when-cross-origin
+    ```
+
+# 🔄 Password Reset (If Implementing)
+
+66. **Reset Token Generation:** Use `crypto.randomBytes(32).toString('hex')` with single-use tokens stored in Redis.
+
+67. **Short Expiration:** Reset tokens **MUST** expire within **15 minutes**.
+
+68. **Token Invalidation:** Invalidate all reset tokens when:
+    - Password is successfully changed
+    - New reset token is requested
+    - User logs in successfully
+
+69. **Password Change Notification:** Send email notification when password is changed, even if not initiated by reset flow.
+
+70. **Session Invalidation on Reset:** When a password is reset, invalidate **all** existing sessions to force re-authentication.
+
+# 📱 Multi-Factor Authentication (Future Enhancement)
+
+71. **TOTP Support:** When implementing MFA, use TOTP (Time-based One-Time Password) with libraries like `@epic-web/totp`.
+
+72. **Backup Codes:** Generate and store backup codes (hashed) for account recovery if MFA device is lost.
+
+73. **MFA Enforcement:** Allow users to enable MFA and optionally enforce it for admin roles.
+
+74. **Recovery Flow:** Implement secure MFA recovery flow with identity verification.
+
+# ✅ Implementation Checklist
+
+## Critical (Implement Immediately)
+
+- [ ] Add rate limiting middleware to all auth endpoints
+- [ ] Reduce magic link expiration from 30 minutes to 5-15 minutes
+- [ ] Implement account lockout after 5 failed login attempts
+- [ ] Add redirect URL validation against `TRUSTED_ORIGINS`
+- [ ] Implement session refresh logic for active users
+- [ ] Add security headers middleware
+
+## High Priority
+
+- [ ] Enhance password complexity validation (uppercase, lowercase, number, special char)
+- [ ] Implement "logout everywhere" functionality
+- [ ] Add security notification emails for important events
+- [ ] Set up authentication event audit logging
+- [ ] Implement monitoring alerts for suspicious activity
+
+## Medium Priority
+
+- [ ] Add password reset functionality with secure tokens
+- [ ] Implement maximum concurrent sessions limit (5)
+- [ ] Add soft deletion for user accounts
+- [ ] Enhance error logging with structured logging
+- [ ] Create security incident response documentation
+
+## Future Enhancements
+
+- [ ] Implement TOTP-based multi-factor authentication
+- [ ] Add biometric authentication support (WebAuthn)
+- [ ] Implement device fingerprinting for fraud detection
+- [ ] Add geographic-based security policies
+- [ ] Create admin dashboard for security monitoring
+
+# 🎯 Code Examples
+
+## Rate Limiting Middleware (Example Implementation)
+
+```typescript
+// src/common/middleware/rate-limit.middleware.ts
+import { cache } from "";
+import type { Elysia } from "elysia";
+
+const RATE_LIMIT_PREFIX = "rate_limit:";
+
+interface RateLimitConfig {
+  maxRequests: number;
+  windowSeconds: number;
+  keyPrefix: string;
+}
+
+export const rateLimit = (config: RateLimitConfig) => {
+  return (app: Elysia) =>
+    app.derive(async ({ request, status }) => {
+      const ip = request.headers.get("x-forwarded-for") || "unknown";
+      const key = `${RATE_LIMIT_PREFIX}${config.keyPrefix}:${ip}`;
+
+      const current = await cache.get(key);
+      const count = current ? parseInt(current) : 0;
+
+      if (count >= config.maxRequests) {
+        throw status(429, {
+          status: 429,
+          message: "Too many requests. Please try again later.",
+        });
+      }
+
+      // Increment counter
+      await cache.set(
+        key,
+        String(count + 1),
+        "EX",
+        config.windowSeconds,
+      );
+
+      return {};
+    });
+};
+
+// Usage in auth handler
+export const authHandler = new Elysia({ prefix: "/auth" })
+  .use(rateLimit({
+    maxRequests: 5,
+    windowSeconds: 900, // 15 minutes
+    keyPrefix: "login"
+  }))
+  .post("/login/password", async ({ body }) => {
+    // ... login logic
+  });
+```
+
+## Enhanced Password Validation Schema
+
+```typescript
+// packages/contracts/src/auth/auth.input.ts
+import { custom, pipe, string, minLength } from "valibot";
+
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
+
+export const passwordSchema = pipe(
+  string(),
+  minLength(8, "Heslo musí obsahovat alespoň 8 znaků"),
+  custom(
+    (value) => PASSWORD_REGEX.test(value),
+    "Heslo musí obsahovat velkć písmeno, malé písmeno, číslo a speciální znak"
+  )
+);
+```
+
+## Redirect URL Validation
+
+```typescript
+// src/api/auth/auth.service.ts
+import { config } from "src/common/config/config";
+
+function validateRedirectUrl(redirectUrl: string): void {
+  const url = new URL(redirectUrl);
+  const allowed = config.TRUSTED_ORIGINS.some(
+    (origin) => url.origin === origin
+  );
+
+  if (!allowed) {
+    throw new Error("Invalid redirect URL");
+  }
+}
+
+// Use in magic link and OAuth flows
+async loginEmail(input: LoginEmailInput): Promise<void> {
+  validateRedirectUrl(input.redirectUrl);
+  // ... rest of logic
+}
+```
+
+---
+
+## 📚 References and Resources
+
+- [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
+- [NIST Digital Identity Guidelines](https://pages.nist.gov/800-63-3/)
+- [OAuth 2.0 Security Best Practices](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics)
+- [Arctic OAuth Library Docs](https://arctic.js.org/)
+- [Bun Password Hashing](https://bun.sh/docs/api/hashing)

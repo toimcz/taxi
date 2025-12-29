@@ -1,9 +1,9 @@
 <script lang="ts">
+import { debounce } from "@taxi/utils";
 import { v7 as uuidv7 } from "uuid";
 import { clickOutside } from "$lib/actions";
-import { debounce } from "$lib/utils/debounce";
 
-export interface AutocompleteSuggestions {
+export interface AutocompleteSuggestion {
 	placePrediction: {
 		placeId: string;
 		text: {
@@ -47,7 +47,7 @@ let {
 
 const sessionToken = uuidv7();
 
-let places = $state<AutocompleteSuggestions[]>([]);
+let places = $state<AutocompleteSuggestion[]>([]);
 
 function search(e: Event) {
 	const target = e.target as HTMLInputElement;
@@ -64,15 +64,26 @@ const resetAutocomplete = () => {
 
 const fetchPlaces = async (query: string) => {
 	if (query.length < 3) return;
-	const response = await fetch(
-		`/api/place-autocomplete?query=${query}&sessionToken=${sessionToken}`,
-	);
-	const data = await response.json();
-	places = data;
+	try {
+		const response = await fetch(
+			`/api/web/places/autocomplete?query=${encodeURIComponent(query)}&sessionToken=${sessionToken}`,
+		);
+
+		if (!response.ok) {
+			console.error("Failed to fetch places:", response.status);
+			return;
+		}
+
+		const data = await response.json();
+		places = data;
+	} catch (error) {
+		console.error("Error fetching places:", error);
+		places = [];
+	}
 };
 const debouncedFetchPlaces = debounce(fetchPlaces, 400);
 
-function handlePlaceClick(place: AutocompleteSuggestions) {
+function handlePlaceClick(place: AutocompleteSuggestion) {
 	setPlaceId(place.placePrediction.placeId);
 	setValue(place.placePrediction.text.text);
 	places = [];

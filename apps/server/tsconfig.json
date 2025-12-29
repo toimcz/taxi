@@ -2,9 +2,19 @@
 	"extends": "@taxi/config/tsconfig.base.json",
 	"compilerOptions": {
 		"composite": true,
-		"outDir": "dist",
-		"baseUrl": ".",
+		"moduleDetection": "force",
 		"jsx": "react-jsx",
-		"strictNullChecks": true
-	}
+		"allowJs": true,
+		"allowImportingTsExtensions": true,
+		"noEmit": true,
+		"noPropertyAccessFromIndexSignature": false
+	},
+	"references": [
+		{
+			"path": "../../packages/api"
+		},
+		{
+			"path": "../../packages/contracts"
+		}
+	]
 }

@@ -88,7 +88,7 @@ let { pages }: Props = $props();
   </div>
 </footer>
 
-<style>
+<style lang="postcss">
   @reference "tailwindcss";
 
   .footer-box hr {

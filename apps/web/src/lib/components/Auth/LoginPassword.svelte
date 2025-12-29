@@ -1,24 +1,35 @@
 <script lang="ts">
+import { LoginPasswordInput } from "@taxi/contracts";
 import { InputEmail, InputPassword } from "@taxi/ui";
-import { goto } from "$app/navigation";
+import { enhance } from "$app/forms";
+import { goto, invalidateAll } from "$app/navigation";
 import { SubmitButton } from "$lib/components/Button";
-import { useLoginPassword } from "$lib/hooks/use-auth.svelte";
+import { useForm } from "$lib/hooks/use-form.svelte";
+import { useToastStore } from "$lib/stores";
+
+const toast = useToastStore();
 
 // DO NOT USE DESTRUCTURING HERE, IT WILL BREAK THE FORM
-const form = useLoginPassword({
-	onSuccess: async (toast) => {
-		toast.add("message", "Přihlášení bylo úspěšné.");
+const form = useForm(LoginPasswordInput, {
+	onSuccess: async () => {
+		await invalidateAll();
+		toast.add("message", "Přihlášení proběhlo úspěšně.");
 		goto("/");
 	},
-	onError: (toast) => {
-		toast.add("error", "Nepodařilo se přihlásit.");
+	onError: (message: string) => {
+		toast.add("error", message);
 	},
 });
 </script>
 
 <div>
   <h1 class="text-center text-xl font-bold">Přihlášení přes email a heslo</h1>
-  <form method="POST" class="mt-5 flex flex-col gap-4" onsubmit={form.submit}>
+  <form
+    action="?/loginPassword"
+    method="POST"
+    class="mt-5 flex flex-col gap-4"
+    use:enhance={form.submit}
+  >
     <InputEmail
       id="email"
       name="email"

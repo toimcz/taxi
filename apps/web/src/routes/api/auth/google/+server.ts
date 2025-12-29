@@ -9,10 +9,7 @@ export const GET = async () => {
 		},
 	});
 	if (err) {
-		return json(
-			{ error: "Nepodařilo se generovat autorizační URL" },
-			{ status: 401 },
-		);
+		return json({ error: "Nepodařilo se generovat autorizační URL" }, { status: 401 });
 	}
 	return json(data);
 };

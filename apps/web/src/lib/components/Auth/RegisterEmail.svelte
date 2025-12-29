@@ -1,18 +1,22 @@
 <script lang="ts">
+import { useRegisterPasswordless } from "@taxi/client-auth";
 import { InputEmail, InputPhone, InputText } from "@taxi/ui";
-import { goto } from "$app/navigation";
+import { goto, invalidateAll } from "$app/navigation";
 import { PUBLIC_APP_URL } from "$env/static/public";
 import { SubmitButton } from "$lib/components/Button";
-import { useRegisterPasswordless } from "$lib/hooks/use-auth.svelte";
+import { useToastStore } from "$lib/stores";
+
+const toast = useToastStore();
 
 // DO NOT USE DESTRUCTURING HERE, IT WILL BREAK THE FORM
 const form = useRegisterPasswordless({
-	onSuccess: (toast) => {
-		toast.add("message", "Email pro registraci byl odeslán.");
+	onSuccess: async () => {
+		await invalidateAll();
+		toast.add("message", "Odkaz pro registraci byl odeslán na váš email.");
 		goto("/");
 	},
-	onError: (toast, error) => {
-		toast.add("error", error ?? "Registrace se nezdařila.");
+	onError: (message: string) => {
+		toast.add("error", message);
 	},
 });
 </script>
@@ -22,7 +26,7 @@ const form = useRegisterPasswordless({
   <p class="text-xs text-gray-500 text-center">
     Budete se přihlašovat odkazem, který Vám bude zaslán na email.
   </p>
-  <form method="POST" class="mt-5 grid grid-cols-2 gap-4" onsubmit={form.submit}>
+  <form method="POST" class="mt-5 grid grid-cols-2 gap-2" onsubmit={form.submit}>
     <div class="col-span-2">
       <InputEmail
         id="email"

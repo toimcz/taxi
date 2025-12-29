@@ -73,10 +73,7 @@ export const postCategories$ = pgTable(
 		index("postcategories_updated_at_index").on(table.updatedAt),
 
 		// Composite indexes for common queries
-		index("postcategories_status_created_at_index").on(
-			table.status,
-			table.createdAt,
-		),
+		index("postcategories_status_created_at_index").on(table.status, table.createdAt),
 		index("postcategories_status_name_index").on(table.status, table.name),
 	],
 );
@@ -87,15 +84,12 @@ export const postCategories$ = pgTable(
  * Defines the relationships between post categories and other entities in the system.
  * Each category can have multiple posts associated with it.
  */
-export const postCategoriesRelations = relations(
-	postCategories$,
-	({ many }) => ({
-		/** @description All posts that belong to this category */
-		posts: many(posts$, {
-			relationName: POST_CATEGORY,
-		}),
+export const postCategoriesRelations = relations(postCategories$, ({ many }) => ({
+	/** @description All posts that belong to this category */
+	posts: many(posts$, {
+		relationName: POST_CATEGORY,
 	}),
-);
+}));
 
 // ============================================================================
 // Type Definitions

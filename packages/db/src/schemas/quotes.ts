@@ -1,12 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import {
-	index,
-	pgTable,
-	smallint,
-	text,
-	timestamp,
-	uuid,
-} from "drizzle-orm/pg-core";
+import { index, pgTable, smallint, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { defaultColumns, primaryUUID } from "./_custom-types";
 import { users$ } from "./auth";
 import { QC_CAR, quoteCars$ } from "./quote-cars";
@@ -17,9 +10,9 @@ export const quotes$ = pgTable(
 	{
 		id: primaryUUID("id"),
 		machineId: uuid("machine_id").notNull().default(sql`uuid_generate_v7()`),
-		fromPlaceId: text("from_place_id"),
+		fromPlaceId: text("from_place_id").notNull(),
 		fromInput: text("from_input").notNull(),
-		toPlaceId: text("to_place_id"),
+		toPlaceId: text("to_place_id").notNull(),
 		toInput: text("to_input").notNull(),
 		pickup: timestamp("pickup", { mode: "date" }).notNull(),
 		dropoff: timestamp("dropoff", { mode: "date" }),
@@ -45,17 +38,9 @@ export const quotes$ = pgTable(
 		// Composite indexes for common query patterns
 		index("quotes_machine_created_idx").on(quotes.machineId, quotes.createdAt),
 		index("quotes_user_created_idx").on(quotes.userId, quotes.createdAt),
-		index("quotes_route_pickup_idx").on(
-			quotes.fromPlaceId,
-			quotes.toPlaceId,
-			quotes.pickup,
-		),
+		index("quotes_route_pickup_idx").on(quotes.fromPlaceId, quotes.toPlaceId, quotes.pickup),
 		index("quotes_source_created_idx").on(quotes.source, quotes.createdAt),
-		index("quotes_pickup_route_idx").on(
-			quotes.pickup,
-			quotes.fromPlaceId,
-			quotes.toPlaceId,
-		),
+		index("quotes_pickup_route_idx").on(quotes.pickup, quotes.fromPlaceId, quotes.toPlaceId),
 	],
 );
 

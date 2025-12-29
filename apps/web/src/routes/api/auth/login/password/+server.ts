@@ -1,5 +1,5 @@
 import { json } from "@sveltejs/kit";
-import { LoginPasswordInput } from "@taxi/contracts/auth/auth.input";
+import { LoginPasswordInput } from "@taxi/contracts";
 import { safeParse } from "valibot";
 import { auth } from "$lib/server/api.js";
 
@@ -18,10 +18,7 @@ export const POST = async ({ request }) => {
 	}
 	const { error } = await auth().login.password.post(validated.output);
 	if (error) {
-		return json(
-			{ success: false, message: "Neplatné přihlášení" },
-			{ status: 401 },
-		);
+		return json({ success: false, message: "Neplatné přihlášení" }, { status: 401 });
 	}
 
 	return json({ success: true, message: "Přihlášení bylo úspěšné" });

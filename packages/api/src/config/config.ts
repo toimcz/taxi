@@ -1,7 +1,7 @@
 import { config as dotenvConfig } from "dotenv";
 import { email, object, optional, parse, picklist, pipe, string, transform } from "valibot";
 
-dotenvConfig({ path: "../../apps/server/.env" });
+dotenvConfig({ path: "../../apps/server/.env", quiet: true });
 
 const configSchema = object({
 	NODE_ENV: pipe(
@@ -29,7 +29,6 @@ const configSchema = object({
 	TOMTOM_API_KEY: string(),
 	GOOGLE_CLIENT_ID: string(),
 	GOOGLE_CLIENT_SECRET: string(),
-	GOOGLE_CALLBACK_URL: string(),
 	GOOGLE_SCOPE: string(),
 	GOSMS_SMS: pipe(
 		string(),

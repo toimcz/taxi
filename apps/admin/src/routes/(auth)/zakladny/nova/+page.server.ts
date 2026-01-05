@@ -1,7 +1,7 @@
 import { error, fail } from "@sveltejs/kit";
 import { BaseCreateInput } from "@taxi/contracts";
-import { admin } from "$lib/orpc/client.server";
-import { validateRequest } from "$lib/server/validate-request";
+import { validateRequest } from "@taxi/shared";
+import { admin } from "$client";
 
 export const load = async () => {
 	const { data: countries, error: err } = await admin.countries.findAll();

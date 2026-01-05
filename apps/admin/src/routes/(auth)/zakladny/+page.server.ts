@@ -1,25 +1,14 @@
 import { error } from "@sveltejs/kit";
 import { PaginationParamsInput } from "@taxi/contracts";
-import { admin } from "$lib/orpc/client.server.js";
-import { validateQuery } from "$lib/server/validate-request";
+import { validateQuery } from "@taxi/shared";
+import { query } from "$client";
 
-export const load = async ({ locals, url }) => {
-	const { output, issues } = await validateQuery(PaginationParamsInput, url);
+export const load = async ({ url }) => {
+	const { output, issues } = validateQuery(PaginationParamsInput, url);
 	if (issues) {
-		error(400, {
-			message: "Neplatné parametry dotazu",
-			cause: issues,
-		});
-	}
-	const { data: bases, error: err } = await admin.bases.findAll(output);
-	if (err) {
-		error(500, {
-			message: err.message,
-			cause: err.cause,
-		});
+		error(400, "Invalid query parameters");
 	}
 	return {
-		bases,
-		auth: locals.user,
+		bases: await query.bases.findAll(output),
 	};
 };

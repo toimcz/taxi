@@ -807,7 +807,7 @@ glob: "**/*.svelte,**/*.ts"
 
 50. **Class Merging Utility:** Use utility functions for conditional class names:
     ```typescript
-    import { cn } from "@taxi/utils"; // classnames or clsx
+    import { cn } from "@taxi/shared"; // classnames or clsx
 
     <div class={cn(
       "base-classes",

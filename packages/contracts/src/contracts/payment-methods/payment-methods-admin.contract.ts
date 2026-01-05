@@ -10,6 +10,14 @@ const findAll = contract
 		path: "/admin/payment-methods",
 	})
 	.output(array(PaymentMethod));
+
+const findAllActive = contract
+	.route({
+		method: "GET",
+		path: "/admin/payment-methods/active",
+	})
+	.output(array(PaymentMethod));
+
 const findById = contract
 	.route({
 		method: "GET",
@@ -17,6 +25,7 @@ const findById = contract
 	})
 	.input(ParamUUID)
 	.output(PaymentMethod);
+
 const create = contract
 	.route({
 		method: "POST",
@@ -24,6 +33,7 @@ const create = contract
 	})
 	.input(PaymentMethodCreateDTO)
 	.output(PaymentMethod);
+
 const update = contract
 	.route({
 		method: "PUT",
@@ -34,6 +44,7 @@ const update = contract
 
 export const paymentMethodsAdminContract = {
 	findAll,
+	findAllActive,
 	findById,
 	create,
 	update,

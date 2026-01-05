@@ -4,12 +4,10 @@ import "@fontsource-variable/geologica";
 import "@fontsource/audiowide";
 // Import 2
 import "$lib/css/app.css";
+import { Footer, Navbar, setToastStore, Toast } from "@taxi/shared";
 // Import 3
 import favicon from "$lib/assets/favicon.svg";
-import { Footer } from "$lib/components/Footer/index.js";
-import { Navbar } from "$lib/components/Navbar/index.js";
-import { Toast } from "$lib/components/Toast/index.js";
-import { setSearchStore, setToastStore } from "$lib/stores/index.js";
+import { setSearchStore } from "$lib/stores/index.js";
 
 let { children, data } = $props();
 

@@ -1,13 +1,9 @@
-import { error } from "@sveltejs/kit";
-import { api } from "$lib/server/api";
+import { query } from "$client";
 
 export const load = async ({ params }) => {
-	const service = await api().services.findBySlug({ slug: params.slug }).get();
-	if (service.error) {
-		error(404, "Service not found");
-	}
+	const service = await query.services.findBySlug(params);
 
 	return {
-		service: service.data,
+		service,
 	};
 };

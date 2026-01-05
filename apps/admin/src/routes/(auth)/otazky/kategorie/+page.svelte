@@ -1,6 +1,5 @@
 <script>
-import { Card } from "@taxi/ui";
-import { WebPage } from "$lib/components";
+import { Card, WebPage } from "@taxi/shared";
 
 const title = "Otázky";
 const description = "Správa otázek";
@@ -19,9 +18,13 @@ let { data } = $props();
           <div class="th">Stav</div>
         </div>
         {#each data.categories as category (category.id)}
-          <a href="/otazky/kategorie/{category.id}" class="tr" class:inactive={!category.status}>
+          <a
+            href="/otazky/kategorie/{category.id}"
+            class="tr"
+            class:inactive={!category.status}
+          >
             <div class="td">{category.name}</div>
-            <div class="td">{category.status ? 'Aktivní' : 'Neaktivní'}</div>
+            <div class="td">{category.status ? "Aktivní" : "Neaktivní"}</div>
           </a>
         {/each}
       </div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Facebook, Google, Instagram } from "@taxi/ui";
+import { Facebook, Google, Instagram } from "@taxi/shared";
 import { page } from "$app/state";
 import {
 	PUBLIC_APP_EMAIL,
@@ -77,11 +77,15 @@ let { pages }: Props = $props();
         <hr />
         <div class="flex flex-col gap-2">
           <p>Telefon:</p>
-          <a href="tel:{PUBLIC_APP_PHONE}" class="text-lg font-bold">{PUBLIC_APP_PHONE}</a>
+          <a href="tel:{PUBLIC_APP_PHONE}" class="text-lg font-bold"
+            >{PUBLIC_APP_PHONE}</a
+          >
         </div>
         <div class="flex flex-col gap-2">
           <p>Email:</p>
-          <a href="mailto:{PUBLIC_APP_EMAIL}" class="text-lg font-bold">{PUBLIC_APP_EMAIL}</a>
+          <a href="mailto:{PUBLIC_APP_EMAIL}" class="text-lg font-bold"
+            >{PUBLIC_APP_EMAIL}</a
+          >
         </div>
       </div>
     </div>

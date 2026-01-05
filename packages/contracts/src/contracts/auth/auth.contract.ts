@@ -10,7 +10,12 @@ import {
 	RegisterPasswordlessDTO,
 	ValidateMagicLinkDTO,
 } from "./auth.input";
-import { GoogleLoginOutput, SuccessOutput, SuccessOutputWithCookies } from "./auth.output";
+import {
+	GoogleCallbackOutput,
+	GoogleLoginOutput,
+	SuccessOutput,
+	SuccessOutputWithCookies,
+} from "./auth.output";
 
 const tags = ["Authentication"];
 
@@ -55,7 +60,8 @@ const callbackGoogle = contract
 		description: "Google callback",
 		tags,
 	})
-	.input(GoogleCallbackDTO);
+	.input(GoogleCallbackDTO)
+	.output(GoogleCallbackOutput);
 
 const registerPassword = contract
 	.route({

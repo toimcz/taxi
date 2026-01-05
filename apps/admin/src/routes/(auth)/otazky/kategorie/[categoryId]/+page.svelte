@@ -1,15 +1,20 @@
 <script lang="ts">
 import { QuestionsCategoryCreateInput, QuestionsCategoryUpdateInput } from "@taxi/contracts";
-import { Card, InputNumber, InputSwitch, InputText } from "@taxi/ui";
+import {
+	Card,
+	InputNumber,
+	InputSwitch,
+	InputText,
+	useForm,
+	useToastStore,
+	WebPage,
+} from "@taxi/shared";
 import { enhance } from "$app/forms";
 import { goto, invalidateAll } from "$app/navigation";
-import { WebPage } from "$lib/components/index.js";
-import { useForm } from "$lib/hooks/use-form.svelte.js";
-import { useToastStore } from "$lib/stores/toast.svelte.js";
 
 const { data } = $props();
 const schema = $derived(
-	data.questionCategory ? QuestionsCategoryUpdateInput : QuestionsCategoryCreateInput,
+	data.category ? QuestionsCategoryUpdateInput : QuestionsCategoryCreateInput,
 );
 const toast = useToastStore();
 
@@ -34,7 +39,7 @@ const form = useForm(schema, {
       <form
         class="flex flex-col gap-4"
         method="post"
-        action={data.questionCategory ? `?/update` : '?/create'}
+        action={data.category ? `?/update` : "?/create"}
         use:enhance={form.submit}
       >
         <div>
@@ -42,7 +47,7 @@ const form = useForm(schema, {
             label="Název kategorie"
             name="name"
             id="name"
-            value={data.questionCategory?.name || ''}
+            value={data.category?.name || ""}
             error={form.issues?.name}
           />
         </div>
@@ -51,7 +56,7 @@ const form = useForm(schema, {
             label="Popis kategorie"
             name="description"
             id="description"
-            value={data.questionCategory?.description || ''}
+            value={data.category?.description || ""}
             error={form.issues?.description}
           />
         </div>
@@ -60,7 +65,7 @@ const form = useForm(schema, {
             label="Pořadí"
             name="order"
             id="order"
-            value={data.questionCategory?.order || ''}
+            value={data.category?.order || ""}
             error={form.issues?.order}
           />
         </div>
@@ -69,13 +74,16 @@ const form = useForm(schema, {
             label="Aktivní"
             name="status"
             id="status"
-            checked={data.questionCategory?.status || false}
+            checked={data.category?.status || false}
             error={form.issues?.status}
           />
         </div>
         <div>
-          <button class="btn btn-primary" type="submit" disabled={form.processing}
-            >{form.processing ? 'Ukládání...' : 'Uložit'}</button
+          <button
+            class="btn btn-primary"
+            type="submit"
+            disabled={form.processing}
+            >{form.processing ? "Ukládání..." : "Uložit"}</button
           >
         </div>
       </form>

@@ -2,6 +2,7 @@ import { hash, verify } from "@node-rs/argon2";
 import { ORPCError } from "@orpc/contract";
 import {
 	type GoogleCallbackDTO,
+	type GoogleLoginOutput,
 	IdentityType,
 	type LoginEmailDTO,
 	type LoginPasswordDTO,
@@ -21,14 +22,6 @@ import { identitiesUseCases } from "./identities.use-cases";
 import { sessionsUseCases } from "./sessions.use-cases";
 
 const logger = new Logger("AuthUseCases");
-
-const googleAuth = new GoogleAuthService({
-	cache: new CacheService("google-oauth-cache"),
-	clientId: config.GOOGLE_CLIENT_ID,
-	clientSecret: config.GOOGLE_CLIENT_SECRET,
-	callbackUrl: config.GOOGLE_CALLBACK_URL,
-	scopes: ["email", "profile"],
-});
 
 const loginPassword = async (input: LoginPasswordDTO): Promise<Session> => {
 	try {
@@ -179,14 +172,30 @@ const registerPasswordless = async (input: RegisterPasswordlessDTO): Promise<voi
 	await magicLinksUseCases.sendMagicLink(identity, input.redirectUrl);
 };
 
-const loginGoogle = (redirectUrl: string): Promise<string> => {
+const loginGoogle = (redirectUrl: string): Promise<GoogleLoginOutput> => {
 	// Validate redirect URL against trusted origins to prevent open redirect attacks
 	validateRedirectUrl(redirectUrl);
 
-	return googleAuth.generateAuthorizationURL(redirectUrl);
+	const googleAuth = new GoogleAuthService({
+		cache: new CacheService("google-oauth-cache"),
+		clientId: config.GOOGLE_CLIENT_ID,
+		clientSecret: config.GOOGLE_CLIENT_SECRET,
+		callbackUrl: redirectUrl,
+		scopes: ["email", "profile"],
+	});
+
+	return googleAuth.generateAuthorizationURL();
 };
 
-export const googleCallback = async (input: GoogleCallbackDTO) => {
+export const googleCallback = async (input: GoogleCallbackDTO): Promise<Session> => {
+	const googleAuth = new GoogleAuthService({
+		cache: new CacheService("google-oauth-cache"),
+		clientId: config.GOOGLE_CLIENT_ID,
+		clientSecret: config.GOOGLE_CLIENT_SECRET,
+		callbackUrl: input.redirectUrl,
+		scopes: ["email", "profile"],
+	});
+
 	const data = await googleAuth.callback(input.code, input.state);
 
 	// Normalize email to lowercase for consistent lookup
@@ -224,12 +233,7 @@ export const googleCallback = async (input: GoogleCallbackDTO) => {
 	// Update last login timestamp
 	await usersUseCases.updateLastLoginAt(user.id);
 
-	const session = await sessionsUseCases.createSession(user.id);
-
-	return {
-		session,
-		redirectUrl: data.redirectUrl,
-	};
+	return await sessionsUseCases.createSession(user.id);
 };
 
 const me = async (sessionId: string): Promise<Session | null> => {

@@ -38,6 +38,7 @@ export const UserCreateInput = object({
 	note: optional(string(), ""),
 	...BillingDetail.entries,
 });
+export const UserUpdateInput = UserCreateInput;
 
 export const UserCreateDTO = object({
 	firstName: pipe(string(), minLength(2, "Jméno musí mít alespoň 2 znaky")),
@@ -50,11 +51,7 @@ export const UserCreateDTO = object({
 });
 
 export type UserCreateDTO = InferOutput<typeof UserCreateDTO>;
-
-export const UserUpdateInput = object({
-	...UserCreateInput.entries,
-	id: pipe(string(), uuid()),
-});
+export type UserUpdateDTO = InferOutput<typeof UserUpdateDTO>;
 
 export const UserPartialUpdateInput = object({
 	...partial(
@@ -79,5 +76,4 @@ export const UserPartialUpdateDTO = object({
 	id: pipe(string(), uuid()),
 });
 
-export type UserUpdateDTO = InferOutput<typeof UserUpdateDTO>;
 export type UserPartialUpdateDTO = InferOutput<typeof UserPartialUpdateDTO>;

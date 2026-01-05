@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@source "../../../node_modules/@taxi/ui";
+@source "../../../node_modules/@taxi/shared";
 
 @theme {
 	--color-text: #1d2025;
@@ -162,7 +162,10 @@ button:hover {
 }
 
 .btn-google {
-	@apply bg-linear-to-r from-red-100 from-10% via-yellow-50 via-30% to-blue-100 to-90% hover:from-red-200 hover:via-yellow-100 hover:to-blue-200 transition-colors duration-200 } .btn-sm { @apply rounded-lg px-3 py-1.5 text-sm;
+	@apply bg-linear-to-r from-red-100 from-10% via-yellow-50 via-30% to-blue-100 to-90% hover:from-red-200 hover:via-yellow-100 hover:to-blue-200 transition-colors duration-200;
+}
+.btn-sm {
+	@apply rounded-lg px-3 py-1.5 text-sm;
 }
 .btn-sm {
 	@apply rounded-lg px-3 py-1.5 text-sm;

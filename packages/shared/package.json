@@ -1,0 +1,58 @@
+{
+	"name": "@taxi/shared",
+	"version": "0.0.0",
+	"devDependencies": {
+		"@foundernest/namecase": "^1.0.5",
+		"@googlemaps/js-api-loader": "^2.0.2",
+		"@sveltejs/package": "^2.5.0",
+		"@sveltejs/vite-plugin-svelte": "^5.1.1",
+		"@types/bun": "^1.3.3",
+		"@types/google.maps": "^3.58.1",
+		"clsx": "^2.1.1",
+		"date-fns": "^4.1.0",
+		"eslint": "^9.34.0",
+		"quill": "^2.0.3",
+		"slugify": "^1.6.6",
+		"svelte": "^5.38.3",
+		"svelte-check": "^4.3.1",
+		"svelte-popperjs": "^1.3.2",
+		"tailwind-merge": "^3.4.0",
+		"typescript": "5.9.2",
+		"vite": "^6.3.5"
+	},
+	"peerDependencies": {
+		"svelte": "^5.0.0"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"svelte": "./dist/index.js",
+			"default": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"!dist/**/*.test.*",
+		"!dist/**/*.spec.*",
+		"src",
+		"!src/**/*.test.*",
+		"!src/**/*.spec.*"
+	],
+	"scripts": {
+		"dev": "svelte-kit sync && svelte-package --watch --input=src",
+		"build": "svelte-kit sync && svelte-package --input=src",
+		"lint": "eslint .",
+		"check-types": "svelte-check --tsconfig ./tsconfig.json"
+	},
+	"sideEffects": [
+		"**/*.css"
+	],
+	"type": "module",
+	"dependencies": {
+		"@lucide/svelte": "^0.556.0",
+		"@popperjs/core": "^2.11.8",
+		"@sveltejs/kit": "^2.49.2",
+		"uuid": "^13.0.0",
+		"valibot": "^1.2.0"
+	}
+}

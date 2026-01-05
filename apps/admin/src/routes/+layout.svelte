@@ -4,7 +4,7 @@ import "@fontsource-variable/geologica";
 import "@fontsource/audiowide";
 // Import 2
 import "$lib/css/app.css";
-import { setToastStore } from "$lib/stores";
+import { setToastStore } from "@taxi/shared";
 
 // Import 3
 

@@ -1,11 +1,16 @@
 <script lang="ts">
 import { CountryCreateInput } from "@taxi/contracts";
-import { Card, InputNumber, InputSwitch, InputText } from "@taxi/ui";
+import {
+	Card,
+	InputNumber,
+	InputSwitch,
+	InputText,
+	useForm,
+	useToastStore,
+	WebPage,
+} from "@taxi/shared";
 import { enhance } from "$app/forms";
 import { goto } from "$app/navigation";
-import { WebPage } from "$lib/components";
-import { useForm } from "$lib/hooks/use-form.svelte.js";
-import { useToastStore } from "$lib/stores";
 
 const toast = useToastStore();
 
@@ -57,8 +62,20 @@ const form = useForm(CountryCreateInput, {
           checked={true}
           error={form.issues?.from}
         />
-        <InputSwitch id="to" label="Vykládka" name="to" checked={true} error={form.issues?.to} />
-        <InputSwitch id="in" label="Kabotáž" name="in" checked={true} error={form.issues?.in} />
+        <InputSwitch
+          id="to"
+          label="Vykládka"
+          name="to"
+          checked={true}
+          error={form.issues?.to}
+        />
+        <InputSwitch
+          id="in"
+          label="Kabotáž"
+          name="in"
+          checked={true}
+          error={form.issues?.in}
+        />
         <InputSwitch
           id="status"
           label="Status"
@@ -67,8 +84,11 @@ const form = useForm(CountryCreateInput, {
           error={form.issues?.status}
         />
         <div class="flex justify-between gap-x-2">
-          <button type="submit" class="btn btn-primary" disabled={form.processing}
-            >{form.processing ? 'Ukládám' : 'Uložit'}</button
+          <button
+            type="submit"
+            class="btn btn-primary"
+            disabled={form.processing}
+            >{form.processing ? "Ukládám" : "Uložit"}</button
           >
           <div>
             <a href="/staty" class="btn btn-light">Zpět</a>

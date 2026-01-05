@@ -190,8 +190,6 @@ export const payments$ = pgTable(
 	],
 );
 
-/** Relation name constant for payment to ride relationship */
-export const PAYMENT_RIDE = "payment_ride";
 /** Relation name constant for payment to payment method relationship */
 export const PAYMENT_PAYMENT_METHOD = "payment_payment_method";
 /** Relation name constant for payment to billing details relationship */

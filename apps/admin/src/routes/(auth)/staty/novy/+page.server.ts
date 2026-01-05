@@ -1,7 +1,7 @@
 import { fail } from "@sveltejs/kit";
 import { CountryCreateInput } from "@taxi/contracts";
-import { admin } from "$lib/orpc/client.server.js";
-import { validateRequest } from "$lib/server/validate-request";
+import { validateRequest } from "@taxi/shared";
+import { mutation } from "$client";
 
 export const actions = {
 	default: async ({ request }) => {
@@ -9,7 +9,7 @@ export const actions = {
 		if (issues) {
 			return fail(400, issues);
 		}
-		const { error } = await admin.countries.create(output);
+		const { error } = await mutation.countries.create(output);
 		if (error) {
 			return fail(500, error.message);
 		}

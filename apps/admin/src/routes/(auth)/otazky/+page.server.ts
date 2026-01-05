@@ -1,11 +1,7 @@
-import { error } from "@sveltejs/kit";
-import { admin } from "$lib/orpc/client.server";
+import { query } from "$client";
 
 export const load = async () => {
-	const { data: questions, error: err } = await admin.questions.findAll();
-	if (err) {
-		error(500, err.message);
-	}
+	const questions = await query.questions.findAll();
 	return {
 		questions,
 	};

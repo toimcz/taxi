@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Briefcase, UsersIcon } from "@lucide/svelte";
 import type { CarWithPrice } from "@taxi/contracts";
-import { text } from "@taxi/utils";
+import { text } from "@taxi/shared";
 
 type Props = {
 	bookingId: string;

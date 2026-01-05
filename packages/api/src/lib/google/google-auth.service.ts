@@ -3,8 +3,14 @@ import { type InferInput, object, string } from "valibot";
 import type { CacheService } from "../cache";
 import { Logger } from "../logger";
 
+export const GoogleGeneratedUrlOutput = object({
+	url: string(),
+	state: string(),
+});
+
+export type GoogleGeneratedUrlOutput = InferInput<typeof GoogleGeneratedUrlOutput>;
+
 export const GoogleAuthState = object({
-	redirectUrl: string(),
 	codeVerifier: string(),
 });
 
@@ -34,7 +40,6 @@ interface GoogleCallbackResponse {
 	refreshToken: string | null;
 	accessTokenExpiresAt: Date | null;
 	idToken: string | null;
-	redirectUrl: string;
 }
 
 export class GoogleAuthService {
@@ -52,14 +57,13 @@ export class GoogleAuthService {
 		this.logger.info("GoogleAuthService initialized");
 	}
 
-	async generateAuthorizationURL(redirectUrl: string): Promise<string> {
+	async generateAuthorizationURL(): Promise<GoogleGeneratedUrlOutput> {
 		const state = arctic.generateState();
 		const codeVerifier = arctic.generateCodeVerifier();
 
 		// uložíme do redis: state -> { next, codeVerifier } jako JSON (TTL 10 min)
 		const key = `${this.GOOGLE_OAUTH_STATE_CACHE_KEY}:${state}`;
 		const authState: GoogleAuthState = {
-			redirectUrl,
 			codeVerifier,
 		};
 		await this.cache.set(key, authState, 10 * 60);
@@ -71,7 +75,10 @@ export class GoogleAuthService {
 		// Request offline access to get refresh token
 		authorizationURL.searchParams.set("access_type", "offline");
 
-		return authorizationURL.toString();
+		return {
+			url: authorizationURL.toString(),
+			state,
+		};
 	}
 
 	/**
@@ -133,7 +140,6 @@ export class GoogleAuthService {
 			refreshToken,
 			accessTokenExpiresAt,
 			idToken,
-			redirectUrl: stateData.redirectUrl,
 		};
 	}
 }

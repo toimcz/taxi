@@ -1,6 +1,6 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
-import type { Session } from "@taxi/contracts/sessions/session";
+import type { Session } from "@taxi/contracts";
 
 declare global {
 	namespace App {

@@ -1,11 +1,17 @@
 <script lang="ts">
 import { BaseCreateInput } from "@taxi/contracts";
-import { Card, Input, InputNumber, InputSwitch, InputText } from "@taxi/ui";
+import {
+	Card,
+	Input,
+	InputNumber,
+	InputSwitch,
+	InputText,
+	useForm,
+	useToastStore,
+	WebPage,
+} from "@taxi/shared";
 import { enhance } from "$app/forms";
 import { goto } from "$app/navigation";
-import { WebPage } from "$lib/components/index.js";
-import { useForm } from "$lib/hooks/use-form.svelte.js";
-import { useToastStore } from "$lib/stores/index.js";
 
 let title = "Nová základna";
 let description = "Nová základna";
@@ -32,9 +38,19 @@ $inspect(form.issues);
       <h1 class="text-xl font-bold">{title}</h1>
     </div>
     <hr />
-    <form method="post" use:enhance={form.submit} class="grid grid-cols-1 gap-4">
+    <form
+      method="post"
+      use:enhance={form.submit}
+      class="grid grid-cols-1 gap-4"
+    >
       <div>
-        <InputText id="city" label="Město" value="" name="city" error={form.issues?.city} />
+        <InputText
+          id="city"
+          label="Město"
+          value=""
+          name="city"
+          error={form.issues?.city}
+        />
       </div>
       <div>
         <Input id="countryId" label="Stát" error={form.issues?.countryId}>
@@ -70,7 +86,7 @@ $inspect(form.issues);
       <div class="flex justify-between gap-x-2">
         <input type="hidden" name="id" value="" />
         <button type="submit" class="btn btn-primary" disabled={form.processing}
-          >{form.processing ? 'Ukládám' : 'Uložit'}</button
+          >{form.processing ? "Ukládám" : "Uložit"}</button
         >
         <div>
           <a href="/zakladny" class="btn btn-light">Zpět</a>

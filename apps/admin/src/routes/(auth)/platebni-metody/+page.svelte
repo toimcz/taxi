@@ -1,6 +1,5 @@
 <script lang="ts">
-import { Card } from "@taxi/ui";
-import { WebPage } from "$lib/components";
+import { Card, WebPage } from "@taxi/shared";
 
 let title = "Platební metody";
 let description = "Seznam platebních metod";

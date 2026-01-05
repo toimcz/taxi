@@ -1,14 +1,10 @@
 import { fail } from "@sveltejs/kit";
 import { BaseUpdateInput } from "@taxi/contracts";
-import { validateRequest } from "@taxi/utils";
-import { admin } from "$lib/orpc/client.server";
+import { validateRequest } from "@taxi/shared";
+import { mutation, query } from "$client";
 
-export const load = async ({ parent, locals }) => {
-	const { base } = await parent();
-	return {
-		base,
-		auth: locals.user,
-	};
+export const load = async ({ params }) => {
+	return { base: await query.bases.findById(params) };
 };
 
 export const actions = {
@@ -19,7 +15,7 @@ export const actions = {
 		if (issues) {
 			return fail(400, issues);
 		}
-		const { error } = await admin.bases.update({
+		const { error } = await mutation.bases.update({
 			id,
 			...output,
 		});

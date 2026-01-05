@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Search } from "$lib/components/Search";
-import { Slider } from "$lib/components/Slider";
+import { Slider } from "@taxi/shared";
+import { Search } from "$lib/components";
 
 type Item = {
 	title: string;

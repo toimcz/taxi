@@ -1,6 +1,6 @@
 import type { HandleValidationError } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
-import { Logger } from "@taxi/utils";
+import { Logger } from "@taxi/shared";
 import { dev } from "$app/environment";
 import { authHandler } from "./lib/handlers/auth.handler";
 
@@ -19,7 +19,7 @@ export const handleError = async ({ error, event }) => {
 };
 
 export const handleValidationError: HandleValidationError = ({ issues }) => {
-	console.error("Validation errors:", issues);
+	console.log(issues);
 	return {
 		message: "Invalid request data.",
 		code: "VALIDATION_ERROR",

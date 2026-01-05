@@ -1,56 +1,20 @@
 <script lang="ts">
 import { Lock, Mail } from "@lucide/svelte";
-import { useGoogleLogin } from "@taxi/client-auth";
-import { Card, Google, Spinner } from "@taxi/ui";
-import { goto } from "$app/navigation";
-import { PUBLIC_APP_URL } from "$env/static/public";
-import RegisterEmail from "$lib/components/Auth/RegisterEmail.svelte";
-import RegisterPassword from "$lib/components/Auth/RegisterPassword.svelte";
-import { WebPage } from "$lib/components/WebPage";
-import { useToastStore } from "$lib/stores";
-
-const toast = useToastStore();
+import { Card, WebPage } from "@taxi/shared";
+import { LoginGoogle, RegisterEmail, RegisterPassword } from "$lib/components";
 
 const title = "Vytvoření účtu";
 const description = "Vytvořte si nový účet v našem systému";
 
 type AuthMethod = "password" | "magic-link";
 let authMethod = $state<AuthMethod>("password");
-
-const form = useGoogleLogin(PUBLIC_APP_URL, {
-	onSuccess: () => {
-		toast.add("message", "Registrace byla úspěšná.");
-		goto("/");
-	},
-	onError: (message: string) => {
-		toast.add("error", message);
-	},
-});
 </script>
 
 <WebPage {title} {description}>
   <div class="flex items-center justify-center pt-10">
     <Card class="w-full max-w-xl flex flex-col gap-2">
       <!-- Primary Auth Method: Google -->
-      <div class="flex flex-col gap-2">
-        <h2 class="text-center text-lg font-semibold text-gray-700">Vytvořit účet</h2>
-        <button
-          type="button"
-          class="btn btn-google"
-          disabled={form.processing}
-          onclick={form.submit}
-          aria-label="Registrovat se přes Google"
-        >
-          <div class="flex items-center gap-2 justify-center">
-            {#if form.processing}
-              <Spinner />
-            {:else}
-              <Google />
-            {/if}
-            Pokračovat s Google
-          </div>
-        </button>
-      </div>
+      <LoginGoogle />
 
       <!-- Divider -->
       <div class="flex items-center gap-3 my-2">
@@ -67,9 +31,9 @@ const form = useGoogleLogin(PUBLIC_APP_URL, {
           'password'
             ? 'bg-white shadow-sm text-gray-900'
             : 'text-gray-600 hover:text-gray-900'}"
-          onclick={() => (authMethod = 'password')}
+          onclick={() => (authMethod = "password")}
           aria-label="Vytvořit účet s heslem"
-          aria-pressed={authMethod === 'password'}
+          aria-pressed={authMethod === "password"}
         >
           <div class="flex items-center gap-2 justify-center">
             <Lock size={16} />
@@ -82,9 +46,9 @@ const form = useGoogleLogin(PUBLIC_APP_URL, {
           'magic-link'
             ? 'bg-white shadow-sm text-gray-900'
             : 'text-gray-600 hover:text-gray-900'}"
-          onclick={() => (authMethod = 'magic-link')}
+          onclick={() => (authMethod = "magic-link")}
           aria-label="Vytvořit účet bez hesla"
-          aria-pressed={authMethod === 'magic-link'}
+          aria-pressed={authMethod === "magic-link"}
         >
           <div class="flex items-center gap-2 justify-center">
             <Mail size={16} />
@@ -95,7 +59,7 @@ const form = useGoogleLogin(PUBLIC_APP_URL, {
 
       <!-- Auth Forms -->
       <div class="mt-2">
-        {#if authMethod === 'password'}
+        {#if authMethod === "password"}
           <RegisterPassword />
         {:else}
           <RegisterEmail />

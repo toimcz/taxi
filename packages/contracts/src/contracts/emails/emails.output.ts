@@ -1,5 +1,5 @@
 import { enum_, type InferOutput, nullable, object, string } from "valibot";
-import { EmailStatus } from "../common";
+import { DateFormat, EmailStatus } from "../common";
 
 export const Email = object({
 	id: string(),
@@ -8,7 +8,6 @@ export const Email = object({
 	subject: string(),
 	status: enum_(EmailStatus),
 	createdById: nullable(string()),
-	createdAt: string(),
-	updatedAt: string(),
+	createdAt: DateFormat,
 });
 export type Email = InferOutput<typeof Email>;

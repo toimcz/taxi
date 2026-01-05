@@ -1,8 +1,7 @@
 <script lang="ts">
 import { ChevronDown, ChevronUp, House, TriangleAlert } from "@lucide/svelte";
-import { Card } from "@taxi/ui";
+import { Card, WebPage } from "@taxi/shared";
 import { page } from "$app/state";
-import { WebPage } from "$lib/components/index.js";
 
 let cause = $derived(page.error?.cause);
 let showDetails = $state(false);

@@ -1,6 +1,5 @@
 <script>
-import { Card } from "@taxi/ui";
-import { WebPage } from "$lib/components";
+import { Card, WebPage } from "@taxi/shared";
 
 let { data } = $props();
 

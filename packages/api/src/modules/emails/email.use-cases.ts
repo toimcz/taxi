@@ -1,5 +1,6 @@
-import { type Email, EmailStatus } from "@taxi/contracts";
+import { type Email, EmailStatus, toDateFormat } from "@taxi/contracts";
 import { db, type EmailSelect, emails$ } from "@taxi/db";
+import { desc } from "drizzle-orm";
 import { config } from "../../config";
 import { BrevoClient, BrevoError, type SendEmailOptions } from "../../lib/brevo";
 import { Logger } from "../../lib/logger";
@@ -7,8 +8,11 @@ import { Logger } from "../../lib/logger";
 const logger = new Logger("EmailService");
 const brevoClient = new BrevoClient(config.BREVO_API_KEY);
 
-const findAll = async (): Promise<Email[]> => {
-	const emails = await db.query.emails$.findMany();
+const findLatest = async (): Promise<Email[]> => {
+	const emails = await db.query.emails$.findMany({
+		orderBy: [desc(emails$.createdAt)],
+		limit: 50,
+	});
 	return emails.map(mapToEmail);
 };
 
@@ -82,11 +86,10 @@ const sendEmail = async (options: SendEmailOptions, createdById: string): Promis
 function mapToEmail(email: EmailSelect): Email {
 	return {
 		...email,
-		createdAt: email.createdAt.toISOString(),
-		updatedAt: email.updatedAt.toISOString(),
+		createdAt: toDateFormat(email.createdAt),
 	};
 }
 export const emailUseCases = {
-	findAll,
+	findLatest,
 	sendEmail,
 };

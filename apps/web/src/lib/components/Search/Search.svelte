@@ -1,13 +1,11 @@
 <script lang="ts">
 import { MoveVertical } from "@lucide/svelte";
 import { QuoteCreateInput } from "@taxi/contracts";
+import { SubmitButton, useForm, useToastStore } from "@taxi/shared";
 import { enhance } from "$app/forms";
 import { goto, invalidateAll } from "$app/navigation";
-import { SubmitButton } from "$lib/components/Button";
 import { SearchDate, SearchPassengers, SearchPlace, SearchTime } from "$lib/components/Search";
-import { useForm } from "$lib/hooks/use-form.svelte";
-import { useToastStore } from "$lib/stores";
-import { useSearchStore } from "$lib/stores/search.svelte";
+import { useSearchStore } from "$lib/stores";
 
 const toast = useToastStore();
 
@@ -48,10 +46,10 @@ function switchPlaces() {
           <div class="relative">
             <SearchPlace
               id="from"
-              name="from"
+              name="fromInput"
               bind:value={searchStore.from}
               bind:placeId={searchStore.fromPlaceId}
-              error={!!form.issues?.from}
+              error={!!form.issues?.fromInput}
             />
             <button
               type="button"
@@ -64,10 +62,10 @@ function switchPlaces() {
           <div>
             <SearchPlace
               id="to"
-              name="to"
+              name="toInput"
               bind:value={searchStore.to}
               bind:placeId={searchStore.toPlaceId}
-              error={!!form.issues?.to}
+              error={!!form.issues?.toInput}
             />
           </div>
         </div>
@@ -91,7 +89,9 @@ function switchPlaces() {
             bind:adults={searchStore.adults}
             bind:children={searchStore.children}
             bind:infants={searchStore.infants}
-            error={!!form.issues?.adults || !!form.issues?.children || !!form.issues?.infants}
+            error={!!form.issues?.adults ||
+              !!form.issues?.children ||
+              !!form.issues?.infants}
           />
         </div>
       </div>

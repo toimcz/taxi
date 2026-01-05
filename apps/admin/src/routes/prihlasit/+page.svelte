@@ -1,92 +1,43 @@
 <script lang="ts">
-import type { SubmitFunction } from "@sveltejs/kit";
-import { LoginGoogleInput, LoginPasswordInput } from "@taxi/contracts";
-import { Card, Google, InputEmail, InputPassword, Spinner } from "@taxi/ui";
-import type { FlatErrors } from "valibot";
+import { LoginPasswordInput } from "@taxi/contracts";
+import {
+	Card,
+	Google,
+	InputEmail,
+	InputPassword,
+	Spinner,
+	SubmitButton,
+	useForm,
+	useToastStore,
+	WebPage,
+} from "@taxi/shared";
 import { enhance } from "$app/forms";
-import { goto, invalidateAll } from "$app/navigation";
-import { SubmitButton } from "$lib/components/Button";
-import { WebPage } from "$lib/components/WebPage";
-import { useToastStore } from "$lib/stores/index.js";
+import { goto } from "$app/navigation";
 
 const title = "Přihlášení";
 const description = "Přihlášení do systému";
 
 const toast = useToastStore();
 
-/* const loginPassword = useLoginPassword({
+const formLoginPassword = useForm(LoginPasswordInput, {
 	onSuccess: async () => {
-		await invalidateAll();
-		toast.add("message", "Přihlášení bylo úspěšné.");
-		goto("/");
+		toast.add("message", "Přihlášení úspěšné");
+		await goto("/");
 	},
-	onError: (message) => {
-		toast.add("error", message);
+	onError: async () => {
+		toast.add("error", "Nepodařilo se přihlásit");
 	},
 });
 
-const googleLogin = useGoogleLogin(PUBLIC_ADMIN_URL, {
-	onSuccess: async () => {
-		await invalidateAll();
-		toast.add("message", "Přihlášení bylo úspěšné.");
-		goto("/");
+const formLoginGoogle = useForm(undefined, {
+	onSuccess: async (data) => {
+		toast.add("message", "Přihlášení úspěšné");
+		window.location.href = data.authUrl as string;
 	},
-	onError: (message: string) => {
-		toast.add("error", message);
+	onError: async () => {
+		toast.add("error", "Nepodařilo se přihlásit");
 	},
-}); */
-
-const loginPassword = () => {
-	let processing = $state(false);
-	let issues = $state<FlatErrors<typeof LoginPasswordInput>["nested"]>();
-	const submit: SubmitFunction = async () => {
-		return async ({ result }) => {
-			if (result.type === "success") {
-				console.log("OK");
-				await invalidateAll();
-				toast.add("message", "Přihlášení bylo úspěšné.");
-				goto("/");
-			} else if (result.type === "failure" && result.data?.issues) {
-				issues = result.data.issues;
-			} else {
-				toast.add("error", "Přihlášení se nezdařilo. Zkontrolujte své údaje a zkuste to znovu.");
-			}
-			processing = false;
-		};
-	};
-
-	return {
-		submit,
-		processing: () => processing,
-		issues: () => issues,
-	};
-};
-
-const loginGoogle = () => {
-	let processing = $state(false);
-	let issues = $state<FlatErrors<typeof LoginGoogleInput>["nested"]>();
-	const submit: SubmitFunction = async () => {
-		return async ({ result }) => {
-			console.log(result);
-			if (result.type === "success" && result.data?.authUrl) {
-				await invalidateAll();
-				toast.add("message", "Přihlášení bylo úspěšné.");
-				window.location.href = result.data.authUrl;
-			} else if (result.type === "failure" && result.data?.issues) {
-				issues = result.data.issues;
-			} else {
-				toast.add("error", "Přihlášení se nezdařilo. Zkontrolujte své údaje a zkuste to znovu.");
-			}
-			processing = false;
-		};
-	};
-
-	return {
-		submit,
-		processing: () => processing,
-		issues: () => issues,
-	};
-};
+});
 </script>
 
 <WebPage {title} {description}>
@@ -99,16 +50,16 @@ const loginGoogle = () => {
           method="POST"
           action="?/google"
           class="flex flex-col gap-2"
-          use:enhance={loginGoogle().submit}
+          use:enhance={formLoginGoogle.submit}
         >
           <button
             type="submit"
             class="btn btn-google"
-            disabled={loginGoogle().processing()}
+            disabled={formLoginGoogle.processing}
             aria-label="Přihlásit se přes Google"
           >
             <div class="flex items-center gap-2 justify-center">
-              {#if loginGoogle().processing()}
+              {#if formLoginGoogle.processing}
                 <Spinner />
               {:else}
                 <Google />
@@ -124,12 +75,14 @@ const loginGoogle = () => {
           <span class="text-sm text-gray-500 font-medium">nebo</span>
           <hr class="flex-1 border-gray-200" />
         </div>
-        <h2 class="text-center text-lg font-semibold">Přihlášení přes email a heslo</h2>
+        <h2 class="text-center text-lg font-semibold">
+          Přihlášení přes email a heslo
+        </h2>
         <form
           method="POST"
           action="?/password"
           class="mt-5 flex flex-col gap-4"
-          use:enhance={loginPassword().submit}
+          use:enhance={formLoginPassword.submit}
         >
           <InputEmail
             id="email"
@@ -137,7 +90,7 @@ const loginGoogle = () => {
             label="Email"
             placeholder="Vyplňte svůj email"
             value=""
-            error={loginPassword().issues()?.email}
+            error={formLoginPassword.issues?.email}
           />
           <InputPassword
             id="password"
@@ -145,11 +98,12 @@ const loginGoogle = () => {
             label="Heslo"
             placeholder="Vyplňte své heslo"
             value=""
-            error={loginPassword().issues()?.password}
+            error={formLoginPassword.issues?.password}
           />
           <div class="flex justify-between">
-            <SubmitButton class="w-full" processing={loginPassword().processing()}
-              >Přihlásit</SubmitButton
+            <SubmitButton
+              class="w-full"
+              processing={formLoginPassword.processing}>Přihlásit</SubmitButton
             >
           </div>
         </form>

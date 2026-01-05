@@ -1,11 +1,17 @@
 <script lang="ts">
 import { QuestionCreateInput, QuestionUpdateInput } from "@taxi/contracts";
-import { Card, Input, InputEditor, InputSwitch, InputText } from "@taxi/ui";
+import {
+	Card,
+	Input,
+	InputEditor,
+	InputSwitch,
+	InputText,
+	useForm,
+	useToastStore,
+	WebPage,
+} from "@taxi/shared";
 import { enhance } from "$app/forms";
 import { goto } from "$app/navigation";
-import { WebPage } from "$lib/components/index.js";
-import { useForm } from "$lib/hooks/use-form.svelte.js";
-import { useToastStore } from "$lib/stores/toast.svelte.js";
 
 const { data } = $props();
 const toast = useToastStore();
@@ -41,7 +47,7 @@ const form = useForm(data.question ? QuestionUpdateInput : QuestionCreateInput, 
       <form
         class="flex flex-col gap-4"
         method="post"
-        action={data.question ? `?/update` : '?/create'}
+        action={data.question ? `?/update` : "?/create"}
         use:enhance={form.submit}
       >
         <div>
@@ -49,13 +55,17 @@ const form = useForm(data.question ? QuestionUpdateInput : QuestionCreateInput, 
             label="Otázka"
             name="question"
             id="question"
-            value={data.question?.question || ''}
+            value={data.question?.question || ""}
             error={form.issues?.question}
           />
         </div>
         <div>
           <Input label="Kategorie" id="category-id">
-            <select name="categoryId" id="category-id" value={data.question?.categoryId || null}>
+            <select
+              name="categoryId"
+              id="category-id"
+              value={data.question?.categoryId || null}
+            >
               {#if data.categories.length}
                 <option value={null}>-- Vyberte kategorii --</option>
                 {#each data.categories as category}
@@ -73,7 +83,7 @@ const form = useForm(data.question ? QuestionUpdateInput : QuestionCreateInput, 
             label="Odpověď"
             name="answer"
             placeholder="Odpověď"
-            content={data.question?.answer || ''}
+            content={data.question?.answer || ""}
           />
         </div>
         <div>
@@ -86,8 +96,11 @@ const form = useForm(data.question ? QuestionUpdateInput : QuestionCreateInput, 
           />
         </div>
         <div>
-          <button class="btn btn-primary" type="submit" disabled={form.processing}
-            >{form.processing ? 'Ukládání...' : 'Uložit'}</button
+          <button
+            class="btn btn-primary"
+            type="submit"
+            disabled={form.processing}
+            >{form.processing ? "Ukládání..." : "Uložit"}</button
           >
         </div>
       </form>

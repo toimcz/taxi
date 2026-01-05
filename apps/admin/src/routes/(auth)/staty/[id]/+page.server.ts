@@ -1,13 +1,11 @@
 import { error, fail } from "@sveltejs/kit";
 import { CountryUpdateInput } from "@taxi/contracts";
-import { admin } from "$lib/orpc/client.server";
-import { validateRequest } from "$lib/server/validate-request";
+import { validateRequest } from "@taxi/shared";
+import { mutation, query } from "$client";
 
 export const load = async ({ params }) => {
-	const { data: country, error: err } = await admin.countries.findById(params);
-	if (err) {
-		error(500, "Failed to load country");
-	}
+	const country = await query.countries.findById(params);
+
 	return {
 		country,
 	};
@@ -20,7 +18,7 @@ export const actions = {
 			return fail(400, issues);
 		}
 
-		const { error: err } = await admin.countries.update({
+		const { error: err } = await mutation.countries.update({
 			id: params.id,
 			...output,
 		});

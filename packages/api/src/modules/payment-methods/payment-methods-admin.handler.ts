@@ -8,6 +8,10 @@ const findAll = paymentMethodsOs.findAll.handler(async () => {
 	return await paymentMethodsUseCases.findAll();
 });
 
+const findAllActive = paymentMethodsOs.findAll.handler(async () => {
+	return await paymentMethodsUseCases.findAllActive();
+});
+
 const create = paymentMethodsOs.create.handler(async ({ input }) => {
 	return await paymentMethodsUseCases.create(input);
 });
@@ -26,6 +30,7 @@ const findById = paymentMethodsOs.findById.handler(async ({ input }) => {
 
 export const paymentMethodsAdminHandler = {
 	findAll,
+	findAllActive,
 	create,
 	update,
 	findById,

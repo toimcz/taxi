@@ -11,8 +11,8 @@ class UsersSearchService extends MeiliSearchService<UserItem[]> {
 			indexName: "users",
 			primaryKey: "id",
 			settings: {
-				searchableAttributes: ["name", "note", "email", "phone", "role"],
-				filterableAttributes: ["name", "note", "email", "phone", "role"],
+				searchableAttributes: ["name", "note", "email", "phone", "roles"],
+				filterableAttributes: ["name", "note", "email", "phone", "roles"],
 			},
 		});
 	}
@@ -34,3 +34,4 @@ class UsersSearchService extends MeiliSearchService<UserItem[]> {
 }
 
 export const usersSearch = new UsersSearchService();
+await usersSearch.init();

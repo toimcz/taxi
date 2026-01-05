@@ -15,6 +15,9 @@ const config = {
 		experimental: {
 			remoteFunctions: true,
 		},
+		alias: {
+			$client: "./src/lib/orpc/client.server.ts",
+		},
 	},
 	compilerOptions: {
 		experimental: {

@@ -1,6 +1,6 @@
 import type { Handle } from "@sveltejs/kit";
+import { auth } from "$client";
 import { COOKIE_NAME } from "$env/static/private";
-import { auth } from "$lib/orpc/client.server";
 
 export const authHandler: Handle = async ({ event, resolve }) => {
 	const sessionId = event.cookies.get(COOKIE_NAME);

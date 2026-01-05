@@ -95,6 +95,7 @@ export const RegisterPasswordlessDTO = object({
 export type RegisterPasswordlessDTO = InferOutput<typeof RegisterPasswordlessDTO>;
 
 export const GoogleCallbackInput = object({
+	redirectUrl: pipe(string(), url("Neplatná URL")),
 	code: string(),
 	state: string(),
 });

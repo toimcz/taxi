@@ -1,11 +1,18 @@
 <script lang="ts">
 import { CarCreateInput, CarUpdateInput } from "@taxi/contracts";
-import { Card, InputMoney, InputNumber, InputPhoto, InputSwitch, InputText } from "@taxi/ui";
+import {
+	Card,
+	InputMoney,
+	InputNumber,
+	InputPhoto,
+	InputSwitch,
+	InputText,
+	useForm,
+	useToastStore,
+	WebPage,
+} from "@taxi/shared";
 import { enhance } from "$app/forms";
 import { goto } from "$app/navigation";
-import { WebPage } from "$lib/components/index.js";
-import { useForm } from "$lib/hooks/use-form.svelte.js";
-import { useToastStore } from "$lib/stores/index.js";
 
 let { data, params } = $props();
 let backUrl = $derived(`/zakladny/${params.id}`);
@@ -36,6 +43,7 @@ const formUpdate = useForm(CarUpdateInput, {
 });
 
 const form = $derived(data.car ? formUpdate : formCreate);
+const action = $derived(data.car ? "?/update" : "?/create");
 </script>
 
 <WebPage {title} {description}>
@@ -44,13 +52,20 @@ const form = $derived(data.car ? formUpdate : formCreate);
       <h1 class="text-xl font-bold">{title}</h1>
       <a href={backUrl} class="btn btn-light btn-sm">Zpět</a>
     </div>
-    <form method="post" enctype="multipart/form-data" class="grid grid-cols-6 gap-4" use:enhance>
+    <hr class="pb-3" />
+    <form
+      method="post"
+      {action}
+      enctype="multipart/form-data"
+      class="grid grid-cols-6 gap-4"
+      use:enhance={form.submit}
+    >
       <div class="col-span-6 lg:col-span-3">
         <InputText
           id="name"
           label="Název kategorie"
           name="name"
-          value={data.car?.name || ''}
+          value={data.car?.name || ""}
           placeholder="Např Standard Car"
           error={form.issues?.name}
         />
@@ -60,7 +75,7 @@ const form = $derived(data.car ? formUpdate : formCreate);
           id="adminName"
           label="Název kategorie v adminu"
           name="adminName"
-          value={data.car?.adminName || ''}
+          value={data.car?.adminName || ""}
           error={form.issues?.adminName}
         />
       </div>
@@ -69,7 +84,7 @@ const form = $derived(data.car ? formUpdate : formCreate);
           id="types"
           label="Typy vozů"
           name="types"
-          value={data.car?.types || ''}
+          value={data.car?.types || ""}
           placeholder="Např. Škoda Octavia, Škoda Superb"
           error={form.issues?.types}
         />
@@ -79,12 +94,12 @@ const form = $derived(data.car ? formUpdate : formCreate);
           id="description"
           label="Popis"
           name="description"
-          value={data.car?.description || ''}
+          value={data.car?.description || ""}
           placeholder="Např. WiFi zdarma, Voda zdarma ..."
           error={form.issues?.description}
         />
       </div>
-      <div class="col-span-3 lg:col-span-1">
+      <div class="col-span-3 lg:col-span-2">
         <InputMoney
           id="priceKm"
           label="Cena za km"
@@ -95,7 +110,7 @@ const form = $derived(data.car ? formUpdate : formCreate);
           error={form.issues?.priceKm}
         />
       </div>
-      <div class="col-span-3 lg:col-span-1">
+      <div class="col-span-3 lg:col-span-2">
         <InputMoney
           id="minPrice"
           label="Minimální cena"
@@ -106,7 +121,7 @@ const form = $derived(data.car ? formUpdate : formCreate);
           error={form.issues?.minPrice}
         />
       </div>
-      <div class="col-span-5 lg:col-span-2">
+      <div class="col-span-3 lg:col-span-2">
         <InputMoney
           id="basePrice"
           label="Základní cena"
@@ -117,7 +132,7 @@ const form = $derived(data.car ? formUpdate : formCreate);
           error={form.issues?.basePrice}
         />
       </div>
-      <div class="col-span-5 lg:col-span-2">
+      <div class="col-span-3">
         <InputNumber
           id="pax"
           label="Max osob"
@@ -128,7 +143,7 @@ const form = $derived(data.car ? formUpdate : formCreate);
           error={form.issues?.pax}
         />
       </div>
-      <div class="col-span-10 lg:col-span-2">
+      <div class="col-span-3">
         <div class="w-1/2 lg:w-full">
           <InputNumber
             id="luggage"
@@ -141,17 +156,17 @@ const form = $derived(data.car ? formUpdate : formCreate);
           />
         </div>
       </div>
-      <div class="col-span-10">
+      <div class="col-span-6">
         <InputText
           id="tags"
           label="Tagy (Max 2 tagy)"
           name="tags"
-          value={data.car?.tags || ''}
+          value={data.car?.tags || ""}
           placeholder="Např. Top Pick, Group Travel, atd."
           error={form.issues?.tags}
         />
       </div>
-      <div class="col-span-5">
+      <div class="col-span-6 lg:col-span-3">
         <InputSwitch
           id="deposit"
           label="Platba předem"
@@ -160,7 +175,7 @@ const form = $derived(data.car ? formUpdate : formCreate);
           error={form.issues?.deposit}
         />
       </div>
-      <div class="col-span-5">
+      <div class="col-span-6 lg:col-span-3">
         <InputSwitch
           id="perPerson"
           label="Cena za osobu"
@@ -169,7 +184,7 @@ const form = $derived(data.car ? formUpdate : formCreate);
           error={form.issues?.perPerson}
         />
       </div>
-      <div class="col-span-5">
+      <div class="col-span-6 lg:col-span-3">
         <InputSwitch
           id="surge"
           label="Dynamika ceny"
@@ -178,7 +193,7 @@ const form = $derived(data.car ? formUpdate : formCreate);
           error={form.issues?.surge}
         />
       </div>
-      <div class="col-span-5">
+      <div class="col-span-6 lg:col-span-3">
         <InputSwitch
           id="status"
           label="Status"
@@ -187,12 +202,21 @@ const form = $derived(data.car ? formUpdate : formCreate);
           error={form.issues?.status}
         />
       </div>
-      <div class="col-span-10">
-        <InputPhoto id="photo" imgUrl={data.car?.photo} name="photo" />
+      <div class="col-span-6">
+        <InputPhoto
+          id="image"
+          imgUrl={data.car?.photo}
+          name="image"
+          error={!!form.issues?.image}
+        />
       </div>
-      <div class="col-span-10">
+      <div class="col-span-6">
         <button type="submit" class="btn btn-primary" disabled={form.processing}
-          >{form.processing ? 'Ukládám' : data.car ? 'Uložit' : 'Vytvořit'}</button
+          >{form.processing
+            ? "Ukládám"
+            : data.car
+              ? "Uložit"
+              : "Vytvořit"}</button
         >
       </div>
     </form>

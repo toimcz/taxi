@@ -1,5 +1,12 @@
-import { MeiliSearch as MeiliSearchClient, type RecordAny, type Settings } from "meilisearch";
+import {
+	type Index,
+	MeiliSearch as MeiliSearchClient,
+	type RecordAny,
+	type Settings,
+} from "meilisearch";
+import { config } from "../../config/config";
 import { Logger } from "../logger";
+import { text } from "../text";
 
 export class MeiliSearch extends MeiliSearchClient {
 	private readonly logger = new Logger("meilisearch-service");
@@ -28,71 +35,54 @@ interface MeiliSearchServiceOptions {
 	settings: Settings;
 }
 
+const INDEX_PREFIX = text.slug(config.APP_NAME);
+
 export class MeiliSearchService<T extends RecordAny[]> extends MeiliSearchClient {
 	private readonly logger = new Logger("Meilisearch");
+	private indexCache: Index<T[number]> | null = null;
+	private readonly prefixedIndexName: string;
+
 	constructor(private readonly options: MeiliSearchServiceOptions) {
 		super({
 			host: options.host,
 			apiKey: options.apiKey,
 		});
+		this.prefixedIndexName = `${INDEX_PREFIX}_${options.indexName}`;
+	}
+
+	private getIndexInstance(): Index<T[number]> {
+		if (!this.indexCache) {
+			this.indexCache = this.index<T[number]>(this.prefixedIndexName);
+		}
+		return this.indexCache;
 	}
 
 	async init(data: T): Promise<void> {
-		const { indexName } = this.options;
-
 		// Delete existing index if it exists
 		try {
-			await this.getIndex(indexName);
-			await this.deleteIndex(indexName);
-			await this.waitForIndexNotExists(indexName);
+			await this.getIndex(this.prefixedIndexName);
+			await this.deleteIndex(this.prefixedIndexName).waitTask();
 		} catch {
 			// Index does not exist, no action needed
 		}
 
-		// Create new index
-		const index = await this.createIndex(indexName, {
+		// Create new index and wait for task to complete
+		await this.createIndex(this.prefixedIndexName, {
 			primaryKey: this.options.primaryKey,
-		});
-		if (!index) {
-			this.logger.warn(`Failed to create MeiliSearch index ${indexName}`);
-			return;
-		}
-		await this.waitForIndexExists(indexName);
+		}).waitTask();
+
+		// Clear index cache after recreation
+		this.indexCache = null;
+
 		await this.configureIndexSettings();
 		await this.addAll(data);
-		this.logger.info(`MeiliSearch index ${indexName} initialized successfully`);
-	}
-
-	private async waitForIndexExists(uid: string, timeoutMs = 10_000): Promise<void> {
-		const start = Date.now();
-		while (Date.now() - start < timeoutMs) {
-			try {
-				await this.getIndex(uid);
-				return;
-			} catch {
-				await new Promise((r) => setTimeout(r, 200));
-			}
-		}
-		throw new Error(`Timeout waiting for MeiliSearch index ${uid} to be created`);
-	}
-
-	private async waitForIndexNotExists(uid: string, timeoutMs = 10_000): Promise<void> {
-		const start = Date.now();
-		while (Date.now() - start < timeoutMs) {
-			try {
-				await this.getIndex(uid);
-				await new Promise((r) => setTimeout(r, 200));
-			} catch {
-				return;
-			}
-		}
-		throw new Error(`Timeout waiting for MeiliSearch index ${uid} to be deleted`);
+		this.logger.info(`MeiliSearch index ${this.prefixedIndexName} initialized successfully`);
 	}
 
 	private async configureIndexSettings(): Promise<void> {
 		try {
-			const index = await this.getIndex(this.options.indexName);
-			await index.updateSettings(this.options.settings);
+			const index = this.getIndexInstance();
+			await index.updateSettings(this.options.settings).waitTask();
 		} catch (error) {
 			this.logger.warn("Failed to configure index settings:");
 			this.logger.warn(error);
@@ -101,33 +91,31 @@ export class MeiliSearchService<T extends RecordAny[]> extends MeiliSearchClient
 
 	private async addAll(data: T): Promise<void> {
 		try {
-			this.logger.info("Adding all routes to MeiliSearch");
+			this.logger.info("Adding all documents to MeiliSearch");
 			if (!data.length) {
-				this.logger.warn("No routes found to add to MeiliSearch");
+				this.logger.warn("No documents found to add to MeiliSearch");
 				return;
 			}
-			// Process in batches for better performance with large datasets
-			const batchSize = 1000;
-			const batches = Math.ceil(data.length / batchSize);
-			for (let i = 0; i < batches; i++) {
-				const start = i * batchSize;
-				const end = start + batchSize;
-				const batch = data.slice(start, end);
 
-				const index = await this.getIndex(this.options.indexName);
-				await index.addDocuments(batch);
+			const index = this.getIndexInstance();
+			const batchSize = 1000;
+
+			for (let i = 0; i < data.length; i += batchSize) {
+				const batch = data.slice(i, i + batchSize);
+				await index.addDocuments(batch).waitTask();
 			}
-			this.logger.info(`All added to MeiliSearch index ${this.options.indexName}`);
+
+			this.logger.info(`All documents added to MeiliSearch index ${this.prefixedIndexName}`);
 		} catch (error) {
-			this.logger.error(`Failed to add all to MeiliSearch: ${this.options.indexName}`);
+			this.logger.error(`Failed to add documents to MeiliSearch: ${this.prefixedIndexName}`);
 			this.logger.error(error);
 		}
 	}
 
 	async addOne(item: T[number]): Promise<void> {
 		try {
-			const index = await this.getIndex(this.options.indexName);
-			await index.addDocuments([item]);
+			const index = this.getIndexInstance();
+			await index.addDocuments([item]).waitTask();
 		} catch (error) {
 			this.logger.error("Failed to add item to MeiliSearch:");
 			this.logger.error(error);
@@ -136,8 +124,8 @@ export class MeiliSearchService<T extends RecordAny[]> extends MeiliSearchClient
 
 	async updateOne(item: T[number]): Promise<void> {
 		try {
-			const index = await this.getIndex(this.options.indexName);
-			await index.updateDocuments([item]);
+			const index = this.getIndexInstance();
+			await index.updateDocuments([item]).waitTask();
 		} catch (error) {
 			this.logger.error("Failed to update item in MeiliSearch:");
 			this.logger.error(error);
@@ -146,8 +134,8 @@ export class MeiliSearchService<T extends RecordAny[]> extends MeiliSearchClient
 
 	async deleteOne(id: string | number): Promise<void> {
 		try {
-			const index = await this.getIndex(this.options.indexName);
-			await index.deleteDocument(id);
+			const index = this.getIndexInstance();
+			await index.deleteDocument(id).waitTask();
 		} catch (error) {
 			this.logger.error("Failed to delete item from MeiliSearch:");
 			this.logger.error(error);
@@ -156,8 +144,8 @@ export class MeiliSearchService<T extends RecordAny[]> extends MeiliSearchClient
 
 	async deleteAll(): Promise<void> {
 		try {
-			const index = await this.getIndex(this.options.indexName);
-			await index.deleteAllDocuments();
+			const index = this.getIndexInstance();
+			await index.deleteAllDocuments().waitTask();
 		} catch (error) {
 			this.logger.error("Failed to delete all items from MeiliSearch:");
 			this.logger.error(error);
@@ -166,8 +154,8 @@ export class MeiliSearchService<T extends RecordAny[]> extends MeiliSearchClient
 
 	async search(query: string): Promise<T> {
 		try {
-			const index = await this.getIndex(this.options.indexName);
-			const searchResult = await index.search<T[number]>(query);
+			const index = this.getIndexInstance();
+			const searchResult = await index.search(query);
 			return searchResult.hits as T;
 		} catch (error) {
 			this.logger.error("Failed to search MeiliSearch:");

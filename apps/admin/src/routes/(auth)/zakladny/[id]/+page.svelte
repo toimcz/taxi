@@ -1,12 +1,11 @@
 <script lang="ts">
-import { Card } from "@taxi/ui";
-import { cn } from "@taxi/utils";
-import { WebPage } from "$lib/components";
+import { Card, cn, WebPage } from "@taxi/shared";
 
 const title = "Základna";
 const description = "Základna";
-
 let { data } = $props();
+
+const base = $derived(data.base);
 </script>
 
 <WebPage {title} {description}>
@@ -19,26 +18,33 @@ let { data } = $props();
       <div>
         <div class="mb-5 grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div>
-            Město: <span class="text-primary pl-4">{data.base.city}</span>
+            Město: <span class="text-primary pl-4">{base.city}</span>
           </div>
           <div>
-            Země: <span class="text-primary pl-4">{data.base.country}</span>
+            Země: <span class="text-primary pl-4">{base.country}</span>
           </div>
           <div>
             Koeficient:
-            <span class="text-primary pl-4">{data.base.koeficient.toFixed(2)}</span>
+            <span class="text-primary pl-4">{base.koeficient.toFixed(2)}</span>
           </div>
           <div>
-            Síla: <span class="text-primary pl-4">{data.base.strength} km</span>
+            Síla: <span class="text-primary pl-4">{base.strength} km</span>
           </div>
           <div>
             Status:
-            <span class="text-primary pl-4">{data.base.status ? 'Aktivní' : 'Neaktivní'}</span>
+            <span class="text-primary pl-4"
+              >{base.status ? "Aktivní" : "Neaktivní"}</span
+            >
           </div>
         </div>
         <div class="flex gap-x-4">
-          <a class="btn btn-primary btn-sm" href="/zakladny/{data.base.id}/edit"> Upravit </a>
-          <a class="btn btn-primary btn-sm" href="/zakladny/{data.base.id}/vozy/novy">
+          <a class="btn btn-primary btn-sm" href="/zakladny/{base.id}/edit">
+            Upravit
+          </a>
+          <a
+            class="btn btn-primary btn-sm"
+            href="/zakladny/{base.id}/vozy/novy"
+          >
             Přidat vůz
           </a>
         </div>
@@ -58,12 +64,12 @@ let { data } = $props();
             <div class="th">Depozit</div>
             <div class="th">Dynamika</div>
           </div>
-          {#each data.base.cars as car (car.id)}
+          {#each base.cars as car (car.id)}
             <a
-              class={cn('tr', {
-                'text-red-500': !car.status,
+              class={cn("tr", {
+                "text-red-500": !car.status,
               })}
-              href="/zakladny/{data.base.id}/vozy/{car.id}"
+              href="/zakladny/{base.id}/vozy/{car.id}"
             >
               <div class="td">{car.name}</div>
               <div class="td">{car.types.slice(0, 23)}</div>
@@ -72,9 +78,9 @@ let { data } = $props();
               <div class="td">{car.priceKm} Kč</div>
               <div class="td">{car.minPrice} Kč</div>
               <div class="td">{car.basePrice} Kč</div>
-              <div class="td">{car.perPerson ? 'Ano' : 'Ne'}</div>
-              <div class="td">{car.deposit ? 'Ano' : 'Ne'}</div>
-              <div class="td">{car.surge ? 'Ano' : 'Ne'}</div>
+              <div class="td">{car.perPerson ? "Ano" : "Ne"}</div>
+              <div class="td">{car.deposit ? "Ano" : "Ne"}</div>
+              <div class="td">{car.surge ? "Ano" : "Ne"}</div>
             </a>
           {/each}
         </div>

@@ -1,17 +1,22 @@
 <script lang="ts">
-import { useRegisterPasswordless } from "@taxi/client-auth";
-import { InputEmail, InputPhone, InputText } from "@taxi/ui";
-import { goto, invalidateAll } from "$app/navigation";
+import { RegisterPasswordlessInput } from "@taxi/contracts";
+import {
+	InputEmail,
+	InputPhone,
+	InputText,
+	SubmitButton,
+	useForm,
+	useToastStore,
+} from "@taxi/shared";
+import { enhance } from "$app/forms";
+import { goto } from "$app/navigation";
 import { PUBLIC_APP_URL } from "$env/static/public";
-import { SubmitButton } from "$lib/components/Button";
-import { useToastStore } from "$lib/stores";
 
 const toast = useToastStore();
 
 // DO NOT USE DESTRUCTURING HERE, IT WILL BREAK THE FORM
-const form = useRegisterPasswordless({
+const form = useForm(RegisterPasswordlessInput, {
 	onSuccess: async () => {
-		await invalidateAll();
 		toast.add("message", "Odkaz pro registraci byl odeslán na váš email.");
 		goto("/");
 	},
@@ -22,11 +27,18 @@ const form = useRegisterPasswordless({
 </script>
 
 <div>
-  <h1 class="text-center text-xl font-bold mb-1">Vytvořit nový účet bez hesla</h1>
+  <h1 class="text-center text-xl font-bold mb-1">
+    Vytvořit nový účet bez hesla
+  </h1>
   <p class="text-xs text-gray-500 text-center">
     Budete se přihlašovat odkazem, který Vám bude zaslán na email.
   </p>
-  <form method="POST" class="mt-5 grid grid-cols-2 gap-2" onsubmit={form.submit}>
+  <form
+    method="POST"
+    action="/novy-ucet?/passwordless"
+    class="mt-5 grid grid-cols-2 gap-2"
+    use:enhance={form.submit}
+  >
     <div class="col-span-2">
       <InputEmail
         id="email"
@@ -73,7 +85,9 @@ const form = useRegisterPasswordless({
     </div>
     <div class="col-span-2 flex justify-between">
       <input type="hidden" name="redirectUrl" value={PUBLIC_APP_URL} />
-      <SubmitButton class="w-full" processing={form.processing}>Vytvořit účet</SubmitButton>
+      <SubmitButton class="w-full" processing={form.processing}
+        >Vytvořit účet</SubmitButton
+      >
     </div>
   </form>
 </div>

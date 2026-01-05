@@ -1,5 +1,6 @@
-import { error } from "@sveltejs/kit";
-import { api } from "$lib/server/api";
+import { redirect } from "@sveltejs/kit";
+import { auth, query } from "$client";
+import { COOKIE_NAME } from "$env/static/private";
 
 const items = [
 	{
@@ -23,20 +24,36 @@ const items = [
 ];
 
 export const load = async () => {
-	const [posts, services, routes] = await Promise.all([
-		api().posts.allPublished.get({ query: { limit: "9", page: "1" } }),
-		api().services.allActive.get(),
-		api().routes.allActive.get({ query: { limit: "9", page: "1" } }),
+	const [posts, services] = await Promise.all([
+		query.posts.findAll({ limit: "9", page: "1" }),
+		query.services.findAll(),
 	]);
-
-	if (posts.error || services.error || routes.error) {
-		error(500, "Failed to load posts, services or routes");
-	}
 
 	return {
 		items,
 		posts: posts.data,
-		services: services.data,
-		routes: routes.data,
+		services: services,
+		routes: [],
 	};
+};
+
+export const actions = {
+	logout: async ({ cookies }) => {
+		const sessionId = cookies.get(COOKIE_NAME);
+
+		if (sessionId) {
+			await auth.logout({ sessionId });
+		}
+
+		cookies.set(COOKIE_NAME, "", {
+			httpOnly: true,
+			secure: true,
+			sameSite: "lax",
+			path: "/",
+			expires: new Date(0),
+			maxAge: 0,
+		});
+
+		redirect(302, "/prihlasit");
+	},
 };

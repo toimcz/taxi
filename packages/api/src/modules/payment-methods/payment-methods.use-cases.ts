@@ -5,10 +5,22 @@ import type {
 	PaymentMethodUpdateDTO,
 } from "@taxi/contracts";
 import { db, paymentMethods$ } from "@taxi/db";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 const findAll = async () => {
 	return db.query.paymentMethods$.findMany();
+};
+
+const findAllActive = async () => {
+	return db.query.paymentMethods$.findMany({
+		where: eq(paymentMethods$.status, true),
+	});
+};
+
+const findAllPublic = async () => {
+	return db.query.paymentMethods$.findMany({
+		where: and(eq(paymentMethods$.public, true), eq(paymentMethods$.status, true)),
+	});
 };
 
 const create = async (data: PaymentMethodCreateDTO): Promise<PaymentMethod> => {
@@ -35,6 +47,8 @@ const findById = async (id: string): Promise<PaymentMethod | undefined> => {
 
 export const paymentMethodsUseCases = {
 	findAll,
+	findAllActive,
+	findAllPublic,
 	create,
 	update,
 	findById,

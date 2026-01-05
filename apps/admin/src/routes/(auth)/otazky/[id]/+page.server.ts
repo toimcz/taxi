@@ -1,7 +1,7 @@
 import { error, fail } from "@sveltejs/kit";
 import { QuestionCreateInput, QuestionUpdateInput } from "@taxi/contracts";
-import { validateRequest } from "@taxi/utils";
-import { admin } from "$lib/orpc/client.server";
+import { validateRequest } from "@taxi/shared";
+import { mutation, query } from "$client";
 
 export const load = async ({ params }) => {
 	if (params.id === "nova") {
@@ -9,11 +9,8 @@ export const load = async ({ params }) => {
 			question: undefined,
 		};
 	}
-	const { data: question, error: err } = await admin.questions.findById({ id: params.id });
+	const question = await query.questions.findById({ id: params.id });
 
-	if (err) {
-		error(500, { message: "Nepodařilo se načíst otázku" });
-	}
 	return {
 		question,
 	};
@@ -25,7 +22,7 @@ export const actions = {
 		if (issues) {
 			return fail(400, { issues });
 		}
-		const { error: err } = await admin.questions.create(output);
+		const { error: err } = await mutation.questions.create(output);
 		if (err) {
 			error(500, { message: "Nepodařilo se vytvořit otázku" });
 		}
@@ -36,7 +33,7 @@ export const actions = {
 		if (issues) {
 			return fail(400, { issues });
 		}
-		const { error: err } = await admin.questions.update({
+		const { error: err } = await mutation.questions.update({
 			id: params.id,
 			...output,
 		});

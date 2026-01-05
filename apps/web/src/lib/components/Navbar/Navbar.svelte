@@ -1,12 +1,10 @@
 <script lang="ts">
 import { Menu, X } from "@lucide/svelte";
-import { useLogout } from "@taxi/client-auth";
 import { cubicOut } from "svelte/easing";
 import { slide } from "svelte/transition";
-import { invalidateAll } from "$app/navigation";
+import { enhance } from "$app/forms";
 import { page } from "$app/state";
 import { LogoText } from "$lib/components/Logo";
-import { useToastStore } from "$lib/stores";
 
 type Page = {
 	title: string;
@@ -20,16 +18,6 @@ type Props = {
 let { pages }: Props = $props();
 let showLinks = $state(false);
 
-const toast = useToastStore();
-const form = useLogout({
-	onSuccess: async () => {
-		await invalidateAll();
-		toast.add("message", "Odhlášení proběhlo úspěšně");
-	},
-	onError: (message: string) => {
-		toast.add("error", message);
-	},
-});
 const staticPages: Page[] = [
 	{
 		title: "Naše vozy",
@@ -57,7 +45,7 @@ $effect(() => {
       <ul class="hidden items-center gap-6 lg:flex">
         {#each pages as page, i (i)}
           <li>
-            <a href={page.slug}>{page.title}</a>
+            <a href="/{page.slug}">{page.title}</a>
           </li>
         {/each}
         {#each staticPages as page, i (i)}
@@ -81,7 +69,7 @@ $effect(() => {
             <a href="/ucet">Můj účet</a>
           </li>
           <li>
-            <form method="POST" onsubmit={form.submit}>
+            <form method="POST" action="/?/logout" use:enhance>
               <button type="submit">Odhlásit se</button>
             </form>
           </li>
@@ -105,7 +93,7 @@ $effect(() => {
     >
       <ul class="flex flex-col gap-6">
         {#each pages as page, i (i)}
-          <li><a href={page.slug}>{page.title}</a></li>
+          <li><a href="/{page.slug}">{page.title}</a></li>
         {/each}
         {#each staticPages as page, i (i)}
           <li><a href={page.slug}>{page.title}</a></li>
@@ -122,7 +110,7 @@ $effect(() => {
             <a href="/ucet">Můj účet</a>
           </li>
           <li>
-            <form method="POST" onsubmit={form.submit}>
+            <form method="POST" action="/?/logout" use:enhance>
               <button type="submit">Odhlásit se</button>
             </form>
           </li>

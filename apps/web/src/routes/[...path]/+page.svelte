@@ -1,5 +1,5 @@
 <script lang="ts">
-import { WebPage } from "$lib/components/WebPage";
+import { WebPage } from "@taxi/shared";
 
 let { data } = $props();
 const title = $derived(data.page.title);

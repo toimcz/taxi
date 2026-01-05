@@ -1,5 +1,5 @@
 <script lang="ts">
-import { cn } from "@taxi/utils";
+import { cn } from "@taxi/shared";
 
 type Props = {
 	src: string;

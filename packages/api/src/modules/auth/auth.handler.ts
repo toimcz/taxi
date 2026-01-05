@@ -1,36 +1,25 @@
 import { implement, ORPCError } from "@orpc/server";
-import { setCookie, sign } from "@orpc/server/helpers";
-import type { ResponseHeadersPluginContext } from "@orpc/server/plugins";
+import { sign } from "@orpc/server/helpers";
 import { authContract } from "@taxi/contracts";
 import { config } from "../../config";
-import type { Context } from "../../context";
-import { Logger } from "../../lib/logger";
+import { authGuard } from "../../guards/auth.guard";
 import { authUseCases } from "./auth.use-cases";
 
-type ORPCContext = ResponseHeadersPluginContext & Context;
-
-const logger = new Logger("AuthHandler");
-const os = implement(authContract).$context<ORPCContext>();
+const os = implement(authContract);
 
 const loginPassword = os.loginPassword.handler(async ({ input }) => {
-	logger.info("Login attempt for user:", input.email);
 	const session = await authUseCases.loginPassword(input);
-	const headers = new Headers();
-	setCookie(
-		headers,
-		config.AUTH_COOKIE,
-		await sign(session.session.sessionId, config.AUTH_SECRET),
-		{
+	return {
+		message: "Login successful",
+		cookie: {
+			name: config.AUTH_COOKIE,
+			value: await sign(session.session.sessionId, config.AUTH_SECRET),
+			expires: new Date(session.session.expiresAt),
 			httpOnly: true,
 			secure: true,
 			sameSite: "lax",
 			path: "/",
-			expires: new Date(session.session.expiresAt),
 		},
-	);
-	return {
-		message: "Login successful",
-		headers,
 	};
 });
 
@@ -40,32 +29,23 @@ const loginEmail = os.loginEmail.handler(async ({ input }) => {
 });
 
 const loginGoogle = os.loginGoogle.handler(async ({ input }) => {
-	const authUrl = await authUseCases.loginGoogle(input.redirectUrl);
-	return {
-		authUrl,
-	};
+	return await authUseCases.loginGoogle(input.redirectUrl);
 });
 
 const googleCallback = os.callbackGoogle.handler(async ({ input }) => {
-	const { session, redirectUrl } = await authUseCases.googleCallback(input);
-	const headers = new Headers();
+	const { session } = await authUseCases.googleCallback(input);
 
-	setCookie(
-		headers,
-		config.AUTH_COOKIE,
-		await sign(session.session.sessionId, config.AUTH_SECRET),
-		{
+	return {
+		message: "Login successful",
+		cookie: {
+			name: config.AUTH_COOKIE,
+			value: await sign(session.sessionId, config.AUTH_SECRET),
+			expires: new Date(session.expiresAt),
 			httpOnly: true,
 			secure: true,
 			sameSite: "lax",
 			path: "/",
-			expires: new Date(session.session.expiresAt),
 		},
-	);
-
-	return {
-		headers,
-		redirectUrl,
 	};
 });
 
@@ -79,22 +59,18 @@ const registerPasswordless = os.registerPasswordless.handler(async ({ input }) =
 	return { message: "Registration successful" };
 });
 
-const me = os.me.handler(async ({ context }) => {
-	if (!context.sessionId) {
+const me = os.me.use(authGuard).handler(async ({ context }) => {
+	if (!context.session) {
 		throw new ORPCError("UNAUTHORIZED", { message: "Invalid session" });
 	}
-	const session = await authUseCases.me(context.sessionId);
-	if (!session) {
-		throw new ORPCError("UNAUTHORIZED", { message: "Invalid session" });
-	}
-	return session;
+	return context.session;
 });
 
-const logout = os.logout.handler(async ({ context }) => {
-	if (!context.sessionId) {
+const logout = os.logout.use(authGuard).handler(async ({ context }) => {
+	if (!context.session) {
 		throw new ORPCError("UNAUTHORIZED", { message: "Invalid session" });
 	}
-	await authUseCases.logout(context.sessionId);
+	await authUseCases.logout(context.session.session.sessionId);
 	return { message: "Logout successful" };
 });
 

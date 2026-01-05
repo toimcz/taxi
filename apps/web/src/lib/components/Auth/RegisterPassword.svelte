@@ -1,16 +1,22 @@
 <script lang="ts">
-import { useRegisterPassword } from "@taxi/client-auth";
-import { InputEmail, InputPassword, InputPhone, InputText } from "@taxi/ui";
-import { goto, invalidateAll } from "$app/navigation";
-import { SubmitButton } from "$lib/components/Button";
-import { useToastStore } from "$lib/stores";
+import { RegisterPasswordInput } from "@taxi/contracts";
+import {
+	InputEmail,
+	InputPassword,
+	InputPhone,
+	InputText,
+	SubmitButton,
+	useForm,
+	useToastStore,
+} from "@taxi/shared";
+import { enhance } from "$app/forms";
+import { goto } from "$app/navigation";
 
 const toast = useToastStore();
 
 // DO NOT USE DESTRUCTURING HERE, IT WILL BREAK THE FORM
-const form = useRegisterPassword({
+const form = useForm(RegisterPasswordInput, {
 	onSuccess: async () => {
-		await invalidateAll();
 		toast.add("message", "Účet byl úspěšně vytvořen.");
 		goto("/");
 	},
@@ -21,11 +27,26 @@ const form = useRegisterPassword({
 </script>
 
 <div>
-  <h1 class="text-center text-xl font-bold mb-1">Vytvořit nový účet s heslem</h1>
-  <p class="text-xs text-gray-500 text-center">Budete se přihlašovat emailem a heslem.</p>
-  <form method="POST" class="mt-5 grid grid-cols-2 gap-2" onsubmit={form.submit}>
+  <h1 class="text-center text-xl font-bold mb-1">
+    Vytvořit nový účet s heslem
+  </h1>
+  <p class="text-xs text-gray-500 text-center">
+    Budete se přihlašovat emailem a heslem.
+  </p>
+  <form
+    method="POST"
+    action="novy-ucet?/password"
+    class="mt-5 grid grid-cols-2 gap-2"
+    use:enhance={form.submit}
+  >
     <div class="col-span-2">
-      <InputEmail id="email" name="email" label="Email" value="" error={form.issues?.email} />
+      <InputEmail
+        id="email"
+        name="email"
+        label="Email"
+        value=""
+        error={form.issues?.email}
+      />
     </div>
     <div class="col-span-1">
       <InputPassword
@@ -64,10 +85,18 @@ const form = useRegisterPassword({
       />
     </div>
     <div class="col-span-2">
-      <InputPhone id="phone" name="phone" label="Telefon" value="" error={form.issues?.phone} />
+      <InputPhone
+        id="phone"
+        name="phone"
+        label="Telefon"
+        value=""
+        error={form.issues?.phone}
+      />
     </div>
     <div class="col-span-2 flex justify-between">
-      <SubmitButton class="w-full" processing={form.processing}>Vytvořit účet</SubmitButton>
+      <SubmitButton class="w-full" processing={form.processing}
+        >Vytvořit účet</SubmitButton
+      >
     </div>
   </form>
 </div>

@@ -1,18 +1,14 @@
 <script lang="ts">
 import { LoginPasswordInput } from "@taxi/contracts";
-import { InputEmail, InputPassword } from "@taxi/ui";
+import { InputEmail, InputPassword, SubmitButton, useForm, useToastStore } from "@taxi/shared";
 import { enhance } from "$app/forms";
-import { goto, invalidateAll } from "$app/navigation";
-import { SubmitButton } from "$lib/components/Button";
-import { useForm } from "$lib/hooks/use-form.svelte";
-import { useToastStore } from "$lib/stores";
+import { goto } from "$app/navigation";
 
 const toast = useToastStore();
 
 // DO NOT USE DESTRUCTURING HERE, IT WILL BREAK THE FORM
 const form = useForm(LoginPasswordInput, {
 	onSuccess: async () => {
-		await invalidateAll();
 		toast.add("message", "Přihlášení proběhlo úspěšně.");
 		goto("/");
 	},
@@ -25,7 +21,7 @@ const form = useForm(LoginPasswordInput, {
 <div>
   <h1 class="text-center text-xl font-bold">Přihlášení přes email a heslo</h1>
   <form
-    action="?/loginPassword"
+    action="/prihlasit?/password"
     method="POST"
     class="mt-5 flex flex-col gap-4"
     use:enhance={form.submit}
@@ -47,7 +43,9 @@ const form = useForm(LoginPasswordInput, {
       error={form.issues?.password}
     />
     <div class="flex justify-between">
-      <SubmitButton class="w-full" processing={form.processing}>Přihlásit</SubmitButton>
+      <SubmitButton class="w-full" processing={form.processing}
+        >Přihlásit</SubmitButton
+      >
     </div>
   </form>
 </div>

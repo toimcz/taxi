@@ -1,12 +1,17 @@
 <script lang="ts">
 import { PaymentMethodCreateInput } from "@taxi/contracts";
-import { Card, Input, InputSwitch, InputText } from "@taxi/ui";
-import { sleep } from "@taxi/utils";
+import {
+	Card,
+	Input,
+	InputSwitch,
+	InputText,
+	sleep,
+	useForm,
+	useToastStore,
+	WebPage,
+} from "@taxi/shared";
 import { enhance } from "$app/forms";
 import { goto } from "$app/navigation";
-import { WebPage } from "$lib/components";
-import { useForm } from "$lib/hooks/use-form.svelte.js";
-import { useToastStore } from "$lib/stores";
 
 let { data } = $props();
 

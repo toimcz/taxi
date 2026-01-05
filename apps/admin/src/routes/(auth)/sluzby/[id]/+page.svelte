@@ -1,12 +1,19 @@
 <script lang="ts">
 import { ServiceCreateInput } from "@taxi/contracts";
-import { Card, InputEditor, InputNumber, InputPhoto, InputSwitch, InputText } from "@taxi/ui";
-import { sleep } from "@taxi/utils";
+import {
+	Card,
+	InputEditor,
+	InputNumber,
+	InputPhoto,
+	InputSwitch,
+	InputText,
+	sleep,
+	useForm,
+	useToastStore,
+	WebPage,
+} from "@taxi/shared";
 import { enhance } from "$app/forms";
 import { goto } from "$app/navigation";
-import { WebPage } from "$lib/components/index.js";
-import { useForm } from "$lib/hooks/use-form.svelte.js";
-import { useToastStore } from "$lib/stores/toast.svelte.js";
 
 let { data } = $props();
 
@@ -70,7 +77,9 @@ const form = useForm(ServiceCreateInput, {
             <InputPhoto
               name="image"
               id="image"
-              imgUrl={data.service?.photo ? `/img/services/${data.service?.photo}` : ''}
+              imgUrl={data.service?.photo
+                ? `/img/services/${data.service?.photo}`
+                : ""}
               full
             />
           </div>

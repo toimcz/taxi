@@ -1,13 +1,19 @@
 <script lang="ts">
 import { Role, UserUpdateInput } from "@taxi/contracts";
-import { Card, InputEmail, InputMultiSelect, InputPhone, InputText, InputTextarea } from "@taxi/ui";
-import { omit } from "valibot";
+import {
+	Card,
+	InputEmail,
+	InputMultiSelect,
+	InputPhone,
+	InputText,
+	InputTextarea,
+	SubmitButton,
+	useForm,
+	useToastStore,
+	WebPage,
+} from "@taxi/shared";
 import { enhance } from "$app/forms";
 import { goto } from "$app/navigation";
-import { SubmitButton } from "$lib/components/Button/index.js";
-import WebPage from "$lib/components/WebPage/WebPage.svelte";
-import { useForm } from "$lib/hooks/use-form.svelte.js";
-import { useToastStore } from "$lib/stores/toast.svelte.js";
 
 const title = "Editace zákazníka";
 const description = "Editace zákazníka";
@@ -16,7 +22,7 @@ let { data } = $props();
 
 const toast = useToastStore();
 
-const form = useForm(omit(UserUpdateInput, ["id"]), {
+const form = useForm(UserUpdateInput, {
 	onSuccess: async () => {
 		console.log("onSuccess");
 		toast.add("message", "Zákazník byl úspěšně uložen");
@@ -34,7 +40,11 @@ const form = useForm(omit(UserUpdateInput, ["id"]), {
       <Card>
         <h1 class="text-lg font-bold">{title}</h1>
         <hr />
-        <form method="post" class="grid grid-cols-2 gap-4" use:enhance={form.submit}>
+        <form
+          method="post"
+          class="grid grid-cols-2 gap-4"
+          use:enhance={form.submit}
+        >
           <InputText
             id="firstName"
             label="Jméno"
@@ -59,7 +69,7 @@ const form = useForm(omit(UserUpdateInput, ["id"]), {
           <InputPhone
             id="phone"
             label="Telefon"
-            value={data.user.phone || ''}
+            value={data.user.phone || ""}
             name="phone"
             error={form.issues?.phone}
           />
@@ -78,7 +88,10 @@ const form = useForm(omit(UserUpdateInput, ["id"]), {
               id="roles"
               label="Role"
               name="roles"
-              options={Object.values(Role).map((role) => ({ label: role, value: role }))}
+              options={Object.values(Role).map((role) => ({
+                label: role,
+                value: role,
+              }))}
               value={data.user.roles}
               error={form.issues?.role}
             />
@@ -89,14 +102,14 @@ const form = useForm(omit(UserUpdateInput, ["id"]), {
           <InputText
             id="name"
             label="Název"
-            value={data.user.billingDetails.name || ''}
+            value={data.user.billingDetails.name || ""}
             name="name"
             error={form.issues?.name}
           />
           <InputText
             id="company"
             label="Firma"
-            value={data.user.billingDetails.company || ''}
+            value={data.user.billingDetails.company || ""}
             name="company"
             error={form.issues?.company}
           />
@@ -104,7 +117,7 @@ const form = useForm(omit(UserUpdateInput, ["id"]), {
             <InputText
               id="street"
               label="Ulice"
-              value={data.user.billingDetails.street || ''}
+              value={data.user.billingDetails.street || ""}
               name="street"
               error={form.issues?.street}
             />
@@ -112,14 +125,14 @@ const form = useForm(omit(UserUpdateInput, ["id"]), {
           <InputText
             id="zip"
             label="PSČ"
-            value={data.user.billingDetails.zip || ''}
+            value={data.user.billingDetails.zip || ""}
             name="zip"
             error={form.issues?.zip}
           />
           <InputText
             id="city"
             label="Město"
-            value={data.user.billingDetails.city || ''}
+            value={data.user.billingDetails.city || ""}
             name="city"
             error={form.issues?.city}
           />
@@ -127,7 +140,7 @@ const form = useForm(omit(UserUpdateInput, ["id"]), {
             <InputText
               id="country"
               label="Stát"
-              value={data.user.billingDetails.country || ''}
+              value={data.user.billingDetails.country || ""}
               name="country"
               error={form.issues?.country}
             />
@@ -136,14 +149,14 @@ const form = useForm(omit(UserUpdateInput, ["id"]), {
           <InputText
             id="ic"
             label="IČ"
-            value={data.user.billingDetails.ic || ''}
+            value={data.user.billingDetails.ic || ""}
             name="ic"
             error={form.issues?.ic}
           />
           <InputText
             id="dic"
             label="DIČ"
-            value={data.user.billingDetails.dic || ''}
+            value={data.user.billingDetails.dic || ""}
             name="dic"
             error={form.issues?.dic}
           />

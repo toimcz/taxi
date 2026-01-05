@@ -1,7 +1,7 @@
 import { error, fail } from "@sveltejs/kit";
 import { ServiceCreateInput, ServiceUpdateInput } from "@taxi/contracts";
-import { admin } from "$lib/orpc/client.server.js";
-import { validateRequest } from "$lib/server/validate-request.js";
+import { validateRequest } from "@taxi/shared";
+import { mutation, query } from "$client";
 
 export const load = async ({ params }) => {
 	if (params.id === "nova") {
@@ -9,10 +9,8 @@ export const load = async ({ params }) => {
 			service: null,
 		};
 	}
-	const { data: service, error: err } = await admin.services.findById(params);
-	if (err) {
-		error(404, "Služba nenalezena");
-	}
+	const service = await query.services.findById(params);
+
 	return {
 		service,
 	};
@@ -24,7 +22,7 @@ export const actions = {
 		if (issues) {
 			return fail(400, { issues });
 		}
-		const { data: service, error: err } = await admin.services.create(output);
+		const { data: service, error: err } = await mutation.services.create(output);
 		if (err) {
 			error(500, "Nepodařilo se vytvořit službu");
 		}
@@ -37,7 +35,7 @@ export const actions = {
 		if (issues) {
 			return fail(400, { issues });
 		}
-		const { data: service, error: err } = await admin.services.update(output);
+		const { data: service, error: err } = await mutation.services.update(output);
 		if (err) {
 			error(500, "Nepodařilo se aktualizovat službu");
 		}

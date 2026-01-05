@@ -1,13 +1,12 @@
-import { error } from "@sveltejs/kit";
-import { api } from "$lib/server/api";
+import { query } from "$client";
 
 export const load = async ({ params }) => {
 	const pathValues = params.path.split("/");
-	const page = await api().pages.findBySlug({ slug: pathValues[0] }).get();
-	if (page.error) {
-		error(404, "Page not found");
-	}
+	const slug = pathValues[pathValues.length - 1];
+	console.log(slug);
+	const page = await query.pages.findBySlug({ slug });
+
 	return {
-		page: page.data,
+		page,
 	};
 };

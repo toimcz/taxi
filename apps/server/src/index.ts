@@ -2,6 +2,7 @@ import { join } from "node:path";
 import { OpenAPIGenerator } from "@orpc/openapi";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { onError } from "@orpc/server";
+import { unsign } from "@orpc/server/helpers";
 import { CORSPlugin, ResponseHeadersPlugin } from "@orpc/server/plugins";
 import { experimental_ValibotToJsonSchemaConverter as ValibotToJsonSchemaConverter } from "@orpc/valibot";
 import { router } from "@taxi/api";
@@ -41,14 +42,15 @@ function getSessionIdFromCookie(request: Request): string | undefined {
 const handler = new OpenAPIHandler(router, {
 	plugins: [
 		new CORSPlugin({
-			exposeHeaders: ["Content-Disposition"],
+			origin: config.TRUSTED_ORIGINS,
+			credentials: true,
+			exposeHeaders: ["Content-Disposition", "Set-Cookie"],
 		}),
 		new ResponseHeadersPlugin(),
 	],
 	interceptors: [
 		onError((error) => {
 			console.error(JSON.stringify(error, null, 2));
-			console.error(JSON.stringify((error as any).cause ? (error as any).cause : {}, null, 2));
 		}),
 	],
 });
@@ -73,7 +75,7 @@ const app = Bun.serve({
 		key: Bun.file(keyFile),
 	},
 	async fetch(request: Request) {
-		console.log(`Incoming request: ${request.method} ${request.url}`);
+		const start = Date.now();
 
 		if (
 			config.NODE_ENV !== "production" &&
@@ -88,11 +90,15 @@ const app = Bun.serve({
 		const { matched, response } = await handler.handle(request, {
 			prefix: "/api",
 			context: {
-				sessionId: getSessionIdFromCookie(request),
+				sessionId: await unsign(getSessionIdFromCookie(request), config.AUTH_SECRET),
 			}, // Provide initial context if needed
 		});
 
 		if (matched) {
+			const duration = Date.now() - start;
+			response.headers.set("X-Response-Time-ms", duration.toString());
+			console.log(`${response.status} ${request.method} ${duration}ms | ${request.url}`);
+
 			return response;
 		}
 

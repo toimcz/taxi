@@ -1,6 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { QuoteCreateInput } from "@taxi/contracts";
-import { validateRequest } from "@taxi/utils";
+import { validateRequest } from "@taxi/shared";
 import { api } from "$lib/server/api";
 
 export const actions = {

@@ -1,9 +1,7 @@
 <script lang="ts">
 import { Lock, Mail, User } from "@lucide/svelte";
-import { useGoogleLogin } from "@taxi/client-auth";
-import { Card, Google, Spinner } from "@taxi/ui";
-import { goto } from "$app/navigation";
-import { PUBLIC_APP_URL } from "$env/static/public";
+import { Card, Google, Spinner } from "@taxi/shared";
+import { enhance } from "$app/forms";
 import LoginEmail from "$lib/components/Auth/LoginEmail.svelte";
 import LoginPassword from "$lib/components/Auth/LoginPassword.svelte";
 import { WebPage } from "$lib/components/WebPage";
@@ -16,28 +14,25 @@ const description = "Přihlášení do systému";
 
 type AuthMethod = "password" | "magic-link";
 let authMethod = $state<AuthMethod>("password");
-
-const googleLogin = useGoogleLogin(PUBLIC_APP_URL, {
-	onSuccess: async () => {
-		goto("/");
-	},
-	onError: (message: string) => {
-		toast.add("error", message);
-	},
-});
 </script>
 
 <WebPage {title} {description}>
   <div class="flex items-center justify-center pt-10">
     <Card class="w-full max-w-md flex flex-col gap-4">
       <!-- Primary Auth Method: Google -->
-      <div class="flex flex-col gap-2">
-        <h2 class="text-center text-lg font-semibold text-gray-700">Přihlásit se</h2>
+      <form
+        method="post"
+        action="?/google"
+        class="flex flex-col gap-2"
+        use:enhance={googleLogin.submit}
+      >
+        <h2 class="text-center text-lg font-semibold text-gray-700">
+          Přihlásit se
+        </h2>
         <button
-          type="button"
+          type="submit"
           class="btn btn-google"
           disabled={googleLogin.processing}
-          onclick={googleLogin.submit}
           aria-label="Přihlásit se přes Google"
         >
           <div class="flex items-center gap-2 justify-center">
@@ -49,7 +44,7 @@ const googleLogin = useGoogleLogin(PUBLIC_APP_URL, {
             Pokračovat s Google
           </div>
         </button>
-      </div>
+      </form>
 
       <!-- Divider -->
       <div class="flex items-center gap-3 my-2">
@@ -66,9 +61,9 @@ const googleLogin = useGoogleLogin(PUBLIC_APP_URL, {
           'password'
             ? 'bg-white shadow-sm text-gray-900'
             : 'text-gray-600 hover:text-gray-900'}"
-          onclick={() => (authMethod = 'password')}
+          onclick={() => (authMethod = "password")}
           aria-label="Přepnout na přihlášení s heslem"
-          aria-pressed={authMethod === 'password'}
+          aria-pressed={authMethod === "password"}
         >
           <div class="flex items-center gap-2 justify-center">
             <Lock size={16} />
@@ -81,9 +76,9 @@ const googleLogin = useGoogleLogin(PUBLIC_APP_URL, {
           'magic-link'
             ? 'bg-white shadow-sm text-gray-900'
             : 'text-gray-600 hover:text-gray-900'}"
-          onclick={() => (authMethod = 'magic-link')}
+          onclick={() => (authMethod = "magic-link")}
           aria-label="Přepnout na přihlášení bez hesla"
-          aria-pressed={authMethod === 'magic-link'}
+          aria-pressed={authMethod === "magic-link"}
         >
           <div class="flex items-center gap-2 justify-center">
             <Mail size={16} />
@@ -94,7 +89,7 @@ const googleLogin = useGoogleLogin(PUBLIC_APP_URL, {
 
       <!-- Auth Forms -->
       <div class="mt-2">
-        {#if authMethod === 'password'}
+        {#if authMethod === "password"}
           <LoginPassword />
         {:else}
           <LoginEmail />
@@ -104,7 +99,11 @@ const googleLogin = useGoogleLogin(PUBLIC_APP_URL, {
       <!-- Tertiary Actions -->
       <hr class="my-2" />
       <div class="flex flex-col gap-2">
-        <a href="/novy-ucet" class="btn btn-light w-full" aria-label="Vytvořit nový účet">
+        <a
+          href="/novy-ucet"
+          class="btn btn-light w-full"
+          aria-label="Vytvořit nový účet"
+        >
           <div class="flex items-center gap-2 justify-center">
             <User size={16} />
             Vytvořit nový účet

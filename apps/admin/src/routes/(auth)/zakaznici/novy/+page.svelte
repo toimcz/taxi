@@ -1,12 +1,19 @@
 <script lang="ts">
 import { Role, UserCreateInput } from "@taxi/contracts";
-import { Card, Input, InputEmail, InputPhone, InputText, InputTextarea } from "@taxi/ui";
+import {
+	Card,
+	Input,
+	InputEmail,
+	InputPhone,
+	InputText,
+	InputTextarea,
+	SubmitButton,
+	useForm,
+	useToastStore,
+	WebPage,
+} from "@taxi/shared";
 import { enhance } from "$app/forms";
 import { goto } from "$app/navigation";
-import SubmitButton from "$lib/components/Button/SubmitButton.svelte";
-import WebPage from "$lib/components/WebPage/WebPage.svelte";
-import { useForm } from "$lib/hooks/use-form.svelte";
-import { useToastStore } from "$lib/stores";
 
 const title = "Nový zákazník";
 const description = "Nový zákazník";
@@ -30,7 +37,11 @@ const form = useForm(UserCreateInput, {
       <Card>
         <h1 class="text-lg font-bold">{title}</h1>
         <hr />
-        <form method="post" class="grid grid-cols-2 gap-4" use:enhance={form.submit}>
+        <form
+          method="post"
+          class="grid grid-cols-2 gap-4"
+          use:enhance={form.submit}
+        >
           <InputText
             id="firstName"
             label="Jméno"
@@ -45,8 +56,20 @@ const form = useForm(UserCreateInput, {
             name="lastName"
             error={form.issues?.lastName}
           />
-          <InputEmail id="email" label="Email" value="" name="email" error={form.issues?.email} />
-          <InputPhone id="phone" label="Telefon" value="" name="phone" error={form.issues?.phone} />
+          <InputEmail
+            id="email"
+            label="Email"
+            value=""
+            name="email"
+            error={form.issues?.email}
+          />
+          <InputPhone
+            id="phone"
+            label="Telefon"
+            value=""
+            name="phone"
+            error={form.issues?.phone}
+          />
           <div class="col-span-2">
             <InputTextarea
               id="note"
@@ -69,7 +92,13 @@ const form = useForm(UserCreateInput, {
           <div class="col-span-2">
             <p>Fakturační údaje</p>
           </div>
-          <InputText id="name" label="Název" value="" name="name" error={form.issues?.name} />
+          <InputText
+            id="name"
+            label="Název"
+            value=""
+            name="name"
+            error={form.issues?.name}
+          />
           <InputText
             id="company"
             label="Firma"
@@ -86,8 +115,20 @@ const form = useForm(UserCreateInput, {
               error={form.issues?.street}
             />
           </div>
-          <InputText id="zip" label="PSČ" value="" name="zip" error={form.issues?.zip} />
-          <InputText id="city" label="Město" value="" name="city" error={form.issues?.city} />
+          <InputText
+            id="zip"
+            label="PSČ"
+            value=""
+            name="zip"
+            error={form.issues?.zip}
+          />
+          <InputText
+            id="city"
+            label="Město"
+            value=""
+            name="city"
+            error={form.issues?.city}
+          />
           <div class="col-span-2">
             <InputText
               id="country"
@@ -98,8 +139,20 @@ const form = useForm(UserCreateInput, {
             />
           </div>
 
-          <InputText id="ic" label="IČ" value="" name="ic" error={form.issues?.ic} />
-          <InputText id="dic" label="DIČ" value="" name="dic" error={form.issues?.dic} />
+          <InputText
+            id="ic"
+            label="IČ"
+            value=""
+            name="ic"
+            error={form.issues?.ic}
+          />
+          <InputText
+            id="dic"
+            label="DIČ"
+            value=""
+            name="dic"
+            error={form.issues?.dic}
+          />
           <div class="col-span-2 flex justify-between gap-x-2">
             <SubmitButton processing={form.processing}>Uložit</SubmitButton>
             <a href="/zakaznici" class="btn btn-light btn-sm">Zpět</a>

@@ -1,14 +1,4 @@
-import {
-	array,
-	boolean,
-	enum_,
-	type InferOutput,
-	nullable,
-	object,
-	optional,
-	string,
-	union,
-} from "valibot";
+import { array, boolean, enum_, type InferOutput, nullable, object, string } from "valibot";
 import { BillingDetail, Role } from "../common";
 import { stringToDate } from "../common-schemas";
 
@@ -37,7 +27,7 @@ export const UserItem = object({
 	email: string(),
 	phone: nullable(string()),
 	note: string(),
-	role: optional(union([string(), array(string())])),
+	roles: array(enum_(Role)),
 	lastLoginAt: nullable(stringToDate("Neplatný formát datumu")),
 });
 

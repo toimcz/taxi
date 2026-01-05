@@ -1,19 +1,14 @@
-import { error } from "@sveltejs/kit";
-import { api } from "$lib/server/api.js";
+import { query } from "$client";
 
 export const load = async ({ locals }) => {
 	const [topPages, bottomPages] = await Promise.all([
-		api().pages.top.get(),
-		api().pages.bottom.get(),
+		query.pages.findTop(),
+		query.pages.findBottom(),
 	]);
 
-	if (topPages.error || bottomPages.error) {
-		throw error(500, "Failed to load pages");
-	}
-
 	return {
-		topPages: topPages.data,
-		bottomPages: bottomPages.data,
+		topPages: topPages,
+		bottomPages: bottomPages,
 		isAuthenticated: locals.isAuthenticated,
 	};
 };

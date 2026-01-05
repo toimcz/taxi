@@ -1,6 +1,5 @@
 <script lang="ts">
-import { Card } from "@taxi/ui";
-import { WebPage } from "$lib/components";
+import { Card, WebPage } from "@taxi/shared";
 
 let title = "Státy";
 let description = "Seznam států";
@@ -26,21 +25,33 @@ let { data } = $props();
           <a href="/staty/{country.id}" class="tr">
             <div class="td">{country.name}</div>
             <div class="td">{country.koeficient}</div>
-            <div class="td" class:text-emerald-600={country.from} class:text-danger={!country.from}>
-              {country.from ? 'Ano' : 'Ne'}
+            <div
+              class="td"
+              class:text-emerald-600={country.from}
+              class:text-danger={!country.from}
+            >
+              {country.from ? "Ano" : "Ne"}
             </div>
-            <div class="td" class:text-emerald-600={country.to} class:text-danger={!country.to}>
-              {country.to ? 'Ano' : 'Ne'}
+            <div
+              class="td"
+              class:text-emerald-600={country.to}
+              class:text-danger={!country.to}
+            >
+              {country.to ? "Ano" : "Ne"}
             </div>
-            <div class="td" class:text-emerald-600={country.in} class:text-danger={!country.in}>
-              {country.in ? 'Ano' : 'Ne'}
+            <div
+              class="td"
+              class:text-emerald-600={country.in}
+              class:text-danger={!country.in}
+            >
+              {country.in ? "Ano" : "Ne"}
             </div>
             <div
               class="td"
               class:text-emerald-600={country.status}
               class:text-danger={!country.status}
             >
-              {country.status ? 'Aktivní' : 'Neaktivní'}
+              {country.status ? "Aktivní" : "Neaktivní"}
             </div>
           </a>
         {/each}
@@ -53,12 +64,21 @@ let { data } = $props();
         <div>{country.name}</div>
         <div>
           <span class="pr-1">{country.koeficient.toFixed(2)}</span>
-          <span class:text-success={country.from} class:text-danger={!country.from}>N</span>
-          <span class:text-success={country.to} class:text-danger={!country.to}>V</span>
-          <span class:text-success={country.in} class:text-danger={!country.in}>K</span>
+          <span
+            class:text-success={country.from}
+            class:text-danger={!country.from}>N</span
+          >
+          <span class:text-success={country.to} class:text-danger={!country.to}
+            >V</span
+          >
+          <span class:text-success={country.in} class:text-danger={!country.in}
+            >K</span
+          >
         </div>
       </a>
     {/each}
-    <div class="pt-2 text-center text-sm">N - nakládka V - vykládka K - kabotáž</div>
+    <div class="pt-2 text-center text-sm">
+      N - nakládka V - vykládka K - kabotáž
+    </div>
   </div>
 </WebPage>

@@ -1,7 +1,6 @@
 <script lang="ts">
-import { debounce } from "@taxi/utils";
+import { clickOutside, debounce } from "@taxi/shared";
 import { v7 as uuidv7 } from "uuid";
-import { clickOutside } from "$lib/actions";
 
 export interface AutocompleteSuggestion {
 	placePrediction: {
@@ -112,20 +111,25 @@ function handlePlaceClick(place: AutocompleteSuggestion) {
     aria-controls="combo-listbox"
     aria-expanded="false"
     aria-haspopup="listbox"
-    aria-invalid={error ? 'true' : undefined}
+    aria-invalid={error ? "true" : undefined}
     role="combobox"
     onfocus={resetAutocomplete}
     onkeydown={(e) => {
-      if (e.key === 'Enter') {
+      if (e.key === "Enter") {
         e.preventDefault();
       }
     }}
     oninput={search}
   />
-  <input id={`${id}-place-id`} type="hidden" name={`${name}PlaceId`} value={placeId} />
+  <input
+    id={`${id}-place-id`}
+    type="hidden"
+    name={`${name}PlaceId`}
+    value={placeId}
+  />
   {#if places.length > 0}
     <div
-      class="suggestions rounded-base absolute left-0 top-full z-10 max-h-[300px] w-full overflow-y-auto px-5 py-2 shadow-xl"
+      class="suggestions rounded-base absolute left-0 top-full z-10 max-h-75 w-full overflow-y-auto px-5 py-2 shadow-xl"
     >
       <ul>
         {#each places as place, i (i)}

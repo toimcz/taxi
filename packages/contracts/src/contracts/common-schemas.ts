@@ -10,10 +10,10 @@ import {
 	pipe,
 	regex,
 	string,
-	toBoolean,
 	toDate,
 	toLowerCase,
 	toNumber,
+	transform,
 	trim,
 	union,
 	uuid,
@@ -52,10 +52,16 @@ export const phoneSchema = (message?: string) =>
 	pipe(string(), custom(validatePhone, message || "Telefon je neplatný"));
 
 export const stringToBoolean = (message?: string) =>
-	pipe(picklist(["true", "false"], message || "Neplatný formát booleanu"), toBoolean());
+	pipe(
+		picklist(["true", "false"], message || "Neplatný formát booleanu"),
+		transform((v) => v === "true"),
+	);
 
 export const stringToNumber = (message?: string) =>
 	pipe(string(), toNumber(message || "Neplatný formát čísla"));
 
 export const stringToDate = (message?: string) =>
-	pipe(union([string(), date()]), toDate(message || "Neplatný formát datumu"));
+	pipe(
+		union([string(message || "Neplatný formát datumu"), date(message || "Neplatný formát datumu")]),
+		toDate(),
+	);

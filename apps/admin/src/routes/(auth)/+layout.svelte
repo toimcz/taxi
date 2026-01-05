@@ -1,7 +1,7 @@
 <script>
 import { ProgressBar } from "@prgm/sveltekit-progress-bar";
-import { Sidebar } from "$lib/components/Sidebar";
-import { Toast } from "$lib/components/Toast";
+import { Toast } from "@taxi/shared";
+import { Sidebar } from "$lib/components";
 
 let { children } = $props();
 </script>

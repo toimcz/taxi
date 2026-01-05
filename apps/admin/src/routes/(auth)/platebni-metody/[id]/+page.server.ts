@@ -1,11 +1,11 @@
-import { error, fail } from "@sveltejs/kit";
+import { fail } from "@sveltejs/kit";
 import {
 	PaymentMethodCreateInput,
 	PaymentMethodProvider,
 	PaymentMethodUpdateInput,
 } from "@taxi/contracts";
-import { admin } from "$lib/orpc/client.server.js";
-import { validateRequest } from "$lib/server/validate-request.js";
+import { validateRequest } from "@taxi/shared";
+import { mutation, query } from "$client";
 
 export const load = async ({ params }) => {
 	const providers = Object.keys(PaymentMethodProvider).map((k) => k.toLowerCase());
@@ -17,10 +17,8 @@ export const load = async ({ params }) => {
 			providers,
 		};
 	}
-	const { data: paymentMethod, error: err } = await admin.paymentMethods.findById(params);
-	if (err) {
-		error(500, err.message);
-	}
+	const paymentMethod = await query.paymentMethods.findById(params);
+
 	return {
 		title: "Upravit platební metodu",
 		description: "Upravte nastavení platební metody pro vaši aplikaci.",
@@ -35,7 +33,7 @@ export const actions = {
 		if (issues) {
 			return fail(400, { issues });
 		}
-		const { error: err } = await admin.paymentMethods.create(output);
+		const { error: err } = await mutation.paymentMethods.create(output);
 		if (err) {
 			return fail(500, err.message);
 		}
@@ -46,7 +44,7 @@ export const actions = {
 		if (issues) {
 			return fail(400, { issues });
 		}
-		const { error: err } = await admin.paymentMethods.update({
+		const { error: err } = await mutation.paymentMethods.update({
 			id: params.id,
 			...output,
 		});

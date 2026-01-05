@@ -1,6 +1,6 @@
 import { redirect } from "@sveltejs/kit";
+import { client } from "$client";
 import { COOKIE_NAME } from "$env/static/private";
-import { client } from "$lib/orpc/client.server";
 
 export const actions = {
 	logout: async ({ cookies }) => {

@@ -1,0 +1,1 @@
+{"version":3,"file":"session.svelte.d.ts","sourceRoot":"","sources":["../../src/stores/session.svelte.ts"],"names":[],"mappings":"AAEA,qBAAa,cAAc,CAAC,CAAC;;gBAahB,GAAG,EAAE,MAAM,EAAE,OAAO,CAAC,EAAE,CAAC;IAkBpC,IAAI,OAAO,QA+DV;IAED,IAAI,OAAO,CAAC,KAAK,KAAA,EAMhB;CACD;AAED,eAAO,MAAM,OAAO,GAAI,CAAC,EAAE,KAAK,MAAM,EAAE,UAAU,CAAC,sBAAwC,CAAC"}
